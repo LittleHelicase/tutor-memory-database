@@ -1,9 +1,15 @@
 
-DB = require './dummy_db'
+root = {}
+
+root.DB = require './dummy_db'
 
 module.exports = (config) ->
+  Set: (newDB) ->
+    root.DB = newDB
   Restore: (DB, file) ->
-    DB = JSON.parse file, fs.readFileSync
+    module.exports.Set JSON.parse file, fs.readFileSync
+  Get: -> root.DB
   Backup: (toFile) ->
-    fs.writeFileSync toFile, JSON.stringify DB
-  Student: (require './student_queries')(DB)
+    fs.writeFileSync toFile, JSON.stringify root.DB
+
+  Student: (require './student_queries')(root)

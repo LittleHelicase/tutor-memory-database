@@ -4,7 +4,7 @@
   "description": "Non persistent memory implementation of database.",
   "main": "./lib/db.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node node_modules/gulp/bin/gulp.js && node_modules/mocha/bin/mocha",
     "prepublish": "node node_modules/gulp/bin/gulp.js"
   },
   "devDependencies": {
@@ -25,6 +25,7 @@
   ],
   "license": "MIT",
   "dependencies": {
+    "async": "^1.4.2",
     "lodash": "^3.10.0",
     "moment": "^2.10.3",
     "node-uuid": "^1.4.3"
