@@ -116,3 +116,44 @@ module.exports = (root) ->
       users: users_ids
     DB.Groups.push newGroup
     result null
+
+  userExists: (id, result) ->
+    user = _.select DB.Users, (u) -> u.id == id
+    if user.length == 1
+      result null, true
+    else if user.length == 0
+      result null, false
+    else
+      result "DB inconsistency: The user #{id} exists multiple times"
+
+  getUserPseudonym: (id, result) ->
+    user = (_.select DB.Users, (u) -> u.id == id)[0]
+    if user && user.pseudonym
+      result null, user.pseudonym
+    else if user
+      result "User #{id} has no pseudonym"
+    else
+      result "User #{id} does not exists"
+
+  setUserPseudonym: (id, pseudonym, result) ->
+    selection = {}
+    user = (_.select DB.Users, (u,idx) ->
+      if u.id == id
+        selection.idx = idx
+      return u.id == id
+    )
+    if user.length == 1
+      DB.Users[selection.idx].pseudonym = pseudonym
+      result null
+    else if user.length == 0
+      result "User #{id} does not exists"
+    else
+      result "DB inconsistency: The user #{id} exists multiple times"
+
+  createUser: (id, matrikel, pseudonym, result) ->
+    user = _.select DB.Users, (u) -> u.id == id
+    if user.length != 0
+      result "User with id #{id} already exists"
+    else
+      DB.Users.push id:id, matrikel:matrikel, pseudonym: pseudonym
+      result null
