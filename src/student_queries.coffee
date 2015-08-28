@@ -157,3 +157,7 @@ module.exports = (root) ->
     else
       DB.Users.push id:id, matrikel:matrikel, pseudonym: pseudonym
       result null
+
+  getPseudonymList: (result) ->
+    pseudonyms = _.map DB.Users, "pseudonym"
+    result null, _.compact pseudonyms

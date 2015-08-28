@@ -108,8 +108,7 @@ module.exports =
   Users:
     [
       {
-        id: "6c884c4a-4b6f-11e5-8099-685b35b5d746"
-        luhid: "ABC-DEF"
+        id: "ABC-DEF"
         matrikel: "1234560"
         pseudonym: "Lazy Dijkstra"
       }
