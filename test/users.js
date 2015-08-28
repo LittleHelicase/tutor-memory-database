@@ -6,7 +6,7 @@ var db = require("../lib/db")();
 
 describe("User queries", function(){
   it("should be possible to query a user", function(done){
-    DB = {Users:[{id:1}]};
+    var DB = {Users:[{id:1}]};
     db.Set(DB);
 
     db.Student.userExists(1,function(err,exists){
@@ -16,7 +16,7 @@ describe("User queries", function(){
     });
   });
   it("should be possible to query a non existing user", function(done){
-    DB = {Users:[{id:1}]};
+    var DB = {Users:[{id:1}]};
     db.Set(DB);
 
     db.Student.userExists(2,function(err,exists){
@@ -26,7 +26,7 @@ describe("User queries", function(){
     });
   });
   it("should detect broken user databases", function(done){
-    DB = {Users:[{id:1},{id:1}]};
+    var DB = {Users:[{id:1},{id:1}]};
     db.Set(DB);
 
     db.Student.userExists(1,function(err,exists){
@@ -35,7 +35,7 @@ describe("User queries", function(){
     });
   });
   it("should be possible to query a users pseudonym", function(done){
-    DB = {Users:[{id:1,pseudonym:"P"}]};
+    var DB = {Users:[{id:1,pseudonym:"P"}]};
     db.Set(DB);
 
     db.Student.getUserPseudonym(1,function(err,pseudonym){
@@ -45,7 +45,7 @@ describe("User queries", function(){
     });
   });
   it("should complain if the user has no pseudonym", function(done){
-    DB = {Users:[{id:1,wrongPseudo:"P"}]};
+    var DB = {Users:[{id:1,wrongPseudo:"P"}]};
     db.Set(DB);
 
     db.Student.getUserPseudonym(1,function(err,pseudonym){
@@ -55,7 +55,7 @@ describe("User queries", function(){
     });
   });
   it("should be possible to change a users pseudonym", function(done){
-    DB = {Users:[{id:1,pseudonym:"P"}]};
+    var DB = {Users:[{id:1,pseudonym:"P"}]};
     db.Set(DB);
 
     db.Student.setUserPseudonym(1,"Q",function(err){
@@ -68,7 +68,7 @@ describe("User queries", function(){
     });
   });
   it("should be possible to create a new user", function(done){
-    DB = {Users:[{}]};
+    var DB = {Users:[{}]};
     db.Set(DB);
 
     db.Student.createUser(1,"12345678","P",function(err){
@@ -82,7 +82,7 @@ describe("User queries", function(){
   });
 
   it("should not be possible to create two users with the same id", function(done){
-    DB = {Users:[{id:1,pseudonym:"P"}]};
+    var DB = {Users:[{id:1,pseudonym:"P"}]};
     db.Set(DB);
 
     db.Student.createUser(1,"12345678","P",function(err){

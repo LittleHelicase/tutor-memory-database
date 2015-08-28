@@ -6,7 +6,7 @@ var db = require("../lib/db")();
 
 describe("Group queries", function(){
   it("should return the group for a user", function(done){
-    DB = {Groups:[
+    var DB = {Groups:[
       {id:1,users:[1,5]},
       {id:2,users:[2,3]},
       {id:3,users:[4]}
@@ -20,7 +20,7 @@ describe("Group queries", function(){
     });
   });
   it("should return an error if the user is in multiple groups", function(done){
-    DB = {Groups:[
+    var DB = {Groups:[
       {id:1,users:[1,5]},
       {id:2,users:[2,1]},
       {id:3,users:[4]}
@@ -34,7 +34,7 @@ describe("Group queries", function(){
   });
 
   it("should be able to leave a group with more than one member", function(done){
-    DB = {Groups:[{id:1,users:[1,2]}],Results:[]};
+    var DB = {Groups:[{id:1,users:[1,2]}],Results:[]};
     db.Set(DB);
     db.Student.leaveGroup(1,function(err){
       (err == null).should.be.true;
@@ -53,7 +53,7 @@ describe("Group queries", function(){
   });
 
   it("should not be able to leave a one-user group", function(done){
-    DB = {Groups:[{id:1,users:[1]}],Results:[]};
+    var DB = {Groups:[{id:1,users:[1]}],Results:[]};
     db.Set(DB);
     db.Student.leaveGroup(1,function(err){
       (err == null).should.be.false;
@@ -62,7 +62,7 @@ describe("Group queries", function(){
   });
 
   it("should be possible to create a group of users who are in no group", function(done){
-    DB = {Groups:[]};
+    var DB = {Groups:[]};
     db.Set(DB);
     db.Student.createGroup([1,2,3], function(err){
       (err == null).should.be.true;
@@ -74,7 +74,7 @@ describe("Group queries", function(){
     });
   });
   it("should not be possible to create a group of users who are in another group", function(done){
-    DB = {Groups:[{id:1,users:[3,4,5]}]};
+    var DB = {Groups:[{id:1,users:[3,4,5]}]};
     db.Set(DB);
     db.Student.createGroup([1,2,3], function(err){
       (err == null).should.be.false;

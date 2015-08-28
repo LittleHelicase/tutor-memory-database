@@ -4,7 +4,7 @@ moment = require 'moment'
 uuid = require 'node-uuid'
 
 groupForUser = (user, DB) ->
-  group = _.filter root.DB.Groups, (g) ->
+  group = _.filter DB.Groups, (g) ->
     _.includes g.users, user
   if group.length != 1
     return -1
@@ -114,11 +114,11 @@ module.exports = (root) ->
     newGroup =
       id: uuid.v4()
       users: users_ids
-    DB.Groups.push newGroup
+    root.DB.Groups.push newGroup
     result null
 
   userExists: (id, result) ->
-    user = _.select DB.Users, (u) -> u.id == id
+    user = _.select root.DB.Users, (u) -> u.id == id
     if user.length == 1
       result null, true
     else if user.length == 0
@@ -127,7 +127,7 @@ module.exports = (root) ->
       result "DB inconsistency: The user #{id} exists multiple times"
 
   getUserPseudonym: (id, result) ->
-    user = (_.select DB.Users, (u) -> u.id == id)[0]
+    user = (_.select root.DB.Users, (u) -> u.id == id)[0]
     if user && user.pseudonym
       result null, user.pseudonym
     else if user
@@ -137,13 +137,13 @@ module.exports = (root) ->
 
   setUserPseudonym: (id, pseudonym, result) ->
     selection = {}
-    user = (_.select DB.Users, (u,idx) ->
+    user = (_.select root.DB.Users, (u,idx) ->
       if u.id == id
         selection.idx = idx
       return u.id == id
     )
     if user.length == 1
-      DB.Users[selection.idx].pseudonym = pseudonym
+      root.DB.Users[selection.idx].pseudonym = pseudonym
       result null
     else if user.length == 0
       result "User #{id} does not exists"
@@ -151,13 +151,13 @@ module.exports = (root) ->
       result "DB inconsistency: The user #{id} exists multiple times"
 
   createUser: (id, matrikel, pseudonym, result) ->
-    user = _.select DB.Users, (u) -> u.id == id
+    user = _.select root.DB.Users, (u) -> u.id == id
     if user.length != 0
       result "User with id #{id} already exists"
     else
-      DB.Users.push id:id, matrikel:matrikel, pseudonym: pseudonym
+      root.DB.Users.push id:id, matrikel:matrikel, pseudonym: pseudonym
       result null
 
   getPseudonymList: (result) ->
-    pseudonyms = _.map DB.Users, "pseudonym"
+    pseudonyms = _.map root.DB.Users, "pseudonym"
     result null, _.compact pseudonyms

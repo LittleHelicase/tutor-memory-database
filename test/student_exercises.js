@@ -7,7 +7,7 @@ var db = require("../lib/db")();
 
 describe("Student Exercise Queries", function(){
   it("should filter not activated exercises", function(done){
-    DB = {Exercises:[
+    var DB = {Exercises:[
       {activationDate: moment().subtract(2, 'days').toJSON()},
       {activationDate: moment().add(2, 'days').toJSON()}
     ]};
@@ -21,7 +21,7 @@ describe("Student Exercise Queries", function(){
   });
 
   it("should return an exercise by id", function(done){
-    DB = {Exercises:[
+    var DB = {Exercises:[
       {activationDate: moment().subtract(2, 'days').toJSON(),id:1},
       {activationDate: moment().add(2, 'days').toJSON(),id:2}
     ]};
@@ -35,7 +35,7 @@ describe("Student Exercise Queries", function(){
   });
 
   it("should not return an unactive exercise by id", function(done){
-    DB = {Exercises:[
+    var DB = {Exercises:[
       {activationDate: moment().subtract(2, 'days').toJSON(),id:1},
       {activationDate: moment().add(2, 'days').toJSON(),id:2}
     ]};
@@ -49,7 +49,7 @@ describe("Student Exercise Queries", function(){
   });
 
   it("should be able to query all active exercises", function(done){
-    DB = {Exercises:[
+    var DB = {Exercises:[
       {activationDate: moment().subtract(2, 'days').toJSON(),dueDate: moment().add(2, 'days').toJSON()},
       {activationDate: moment().subtract(2, 'days').toJSON(),dueDate: moment().subtract(1, 'days').toJSON()},
       {activationDate: moment().add(2, 'days').toJSON(),dueDate: moment().subtract(2, 'days').toJSON()}
