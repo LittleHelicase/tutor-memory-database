@@ -14,10 +14,11 @@ module.exports = (root) ->
   # Returns all exercises. Expired and active ones.
   getExercises: (result) ->
     # Memory queries don't fail...
-    result null, _(root.DB.Exercises).chain()
-      .filter (ex) -> moment().isAfter ex.activationDate
-      .map (ex) -> (ex.tasks = _.map ex.tasks, (t) -> t.id); ex
-      .value()
+    result null,
+      _(root.DB.Exercises).chain()
+        .filter (ex) -> moment().isAfter ex.activationDate
+        .map (ex) -> (ex.tasks = _.map ex.tasks, (t) -> t.id); ex
+        .value()
 
 
   # Returns a specific exercise by id
