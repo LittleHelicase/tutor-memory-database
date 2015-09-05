@@ -102,7 +102,7 @@ module.exports =
       {
         name: "One man group"
         id: "af3fb55a-4b6f-11e5-90ba-685b35b5d746"
-        users: [ "6c884c4a-4b6f-11e5-8099-685b35b5d746" ]
+        users: [ "ABC-DEF" ]
       }
     ]
   Users:
@@ -111,5 +111,15 @@ module.exports =
         id: "ABC-DEF"
         matrikel: "1234560"
         pseudonym: "Lazy Dijkstra"
+      },
+      {
+        id: "NO-GROUP-1"
+        matrikel: "9234560"
+        pseudonym: "Lonely Gates"
+      },
+      {
+        id: "NO-GROUP-2"
+        matrikel: "8234560"
+        pseudonym: "Tiny Knuth"
       }
     ]

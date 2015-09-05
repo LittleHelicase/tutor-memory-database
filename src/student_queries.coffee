@@ -14,8 +14,11 @@ module.exports = (root) ->
   # Returns all exercises. Expired and active ones.
   getExercises: (result) ->
     # Memory queries don't fail...
-    result null, _.filter root.DB.Exercises, (ex) ->
-      moment().isAfter ex.activationDate
+    result null, _(root.DB.Exercises).chain()
+      .filter (ex) -> moment().isAfter ex.activationDate
+      .map (ex) -> (ex.tasks = _.map ex.tasks, (t) -> t.id); ex
+      .value()
+
 
   # Returns a specific exercise by id
   getExerciseById: (id, result) ->
@@ -35,6 +38,7 @@ module.exports = (root) ->
         .filter (ex) ->
           (moment().isAfter ex.activationDate) and
           moment().isBefore ex.dueDate
+        .map (ex) -> (ex.tasks = _.map ex.tasks, (t) -> t.id); ex
         .value()
 
   # Exercise containing the tasks
@@ -98,7 +102,7 @@ module.exports = (root) ->
 
     # insert results for new group
     root.DB.Results.push groupResults
-    result null
+    result null, newGroup
 
   # creates a group with specified users
   createGroup: (users_ids, result) ->
@@ -115,7 +119,7 @@ module.exports = (root) ->
       id: uuid.v4()
       users: users_ids
     root.DB.Groups.push newGroup
-    result null
+    result null, newGroup
 
   userExists: (id, result) ->
     user = _.select root.DB.Users, (u) -> u.id == id
@@ -136,6 +140,10 @@ module.exports = (root) ->
       result "User #{id} does not exists"
 
   setUserPseudonym: (id, pseudonym, result) ->
+    pseudonymUser = _.select root.DB.Users, (u) -> u.pseudonym == pseudonym
+    if pseudonymUser.length > 0
+      result "Pseudonym #{pseudonym} already taken"
+      return
     selection = {}
     user = (_.select root.DB.Users, (u,idx) ->
       if u.id == id

@@ -1,4 +1,6 @@
 
+fs = require 'fs'
+
 root = {}
 
 root.DB = require './dummy_db'
