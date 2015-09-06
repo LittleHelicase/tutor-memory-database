@@ -17,7 +17,10 @@ module.exports = (root) ->
     result null,
       _(root.DB.Exercises).chain()
         .filter (ex) -> moment().isAfter ex.activationDate
-        .map (ex) -> (ex.tasks = _.map ex.tasks, (t) -> t.id); ex
+        .map (ex) ->
+          exNew = _.clone ex
+          exNew.tasks = _.map ex.tasks, (t) -> t.id
+          exNew
         .value()
 
 

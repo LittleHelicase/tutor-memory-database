@@ -8,8 +8,8 @@ root.DB = require './dummy_db'
 module.exports = (config) ->
   Set: (newDB) ->
     root.DB = newDB
-  Restore: (DB, file) ->
-    module.exports.Set JSON.parse file, fs.readFileSync
+  Restore: (file) ->
+    root.DB = JSON.parse fs.readFileSync file, "utf8"
   Get: -> root.DB
   Backup: (toFile) ->
     fs.writeFileSync toFile, JSON.stringify root.DB
