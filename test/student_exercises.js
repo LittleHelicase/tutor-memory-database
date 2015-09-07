@@ -62,4 +62,19 @@ describe("Student Exercise Queries", function(){
       done();
     });
   });
+
+  it("should be able to get detailed information for an exercise", function(done){
+    var DB = {Exercises:[
+      {id:"abc",activationDate: moment().subtract(2, 'days').toJSON()},
+      {id:"cde",activationDate: moment().subtract(2, 'days').toJSON()},
+      {id:"efg",activationDate: moment().subtract(2, 'days').toJSON()}
+    ]};
+    db.Set(DB);
+
+    db.Student.getDetailedExercise("abc",function(err,ex){
+      (err == null).should.be.true;
+      (Array.isArray(ex)).should.be.false;
+      done();
+    });
+  });
 });

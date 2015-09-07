@@ -31,6 +31,10 @@ module.exports = (root) ->
         .filter (ex) ->
           moment().isAfter ex.activationDate
         .filter id: id
+        .map (ex) ->
+          exNew = _.clone ex
+          exNew.tasks = _.map ex.tasks, (t) -> t.id
+          exNew
         .first()
         .value()
 
@@ -47,8 +51,13 @@ module.exports = (root) ->
 
   # Exercise containing the tasks
   getDetailedExercise: (id, result) ->
-    result null, _.filter root.DB.Exercises, (ex) ->
-      moment().isAfter ex.activationDate
+    result null,
+      _(root.DB.Exercises).chain()
+        .filter (ex) ->
+          moment().isAfter ex.activationDate
+        .filter id: id
+        .first()
+        .value()
 
   # get the Group of one user
   getGroupForUser: (user_id, result) ->
