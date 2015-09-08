@@ -118,8 +118,10 @@ module.exports = (root) ->
     result null, newGroup
 
   # creates a group with specified users
-  createGroup: (users_ids, result) ->
-    usersInGroup = _(users_ids).chain()
+  ### old version only accepting users in no group
+  createGroup: (user_id, group_users, result) ->
+    usersInGroup = _(group_users).chain()
+      .reject (id) -> id == user_id   # the creator immediatley joins the group
       .map _.partial groupForUser, _, root.DB
       .map (g,idx) -> if g==-1 then null else users_ids[idx]
       .compact()
@@ -133,6 +135,33 @@ module.exports = (root) ->
       users: users_ids
     root.DB.Groups.push newGroup
     result null, newGroup
+  ###
+
+  createGroup: (user_id, group_users, result) ->
+    # the creator immediatley joins the group
+    pending = _.reject group_users, (id) -> id == user_id
+
+    newGroup =
+      id: uuid.v4()
+      users: [user_id]
+    if pending.length > 0
+      newGroup.pendingUsers = pending
+    root.DB.Groups.push newGroup
+    result null, newGroup
+
+  # returns a list of groups with pending invitations
+  getPendingGroups: (user_id, result) ->
+    
+
+  joinGroup: (user_id, group_id, result) ->
+    group = _.filter root.DB.Groups, id: group_id
+    if group.length > 1
+      result "Inconsistent groups. Multiple groups with ID: #{group_id}"
+      return
+    if group.length < 0
+      result "Cannot join non existing group (ID: #{group_id})"
+      return
+
 
   userExists: (id, result) ->
     user = _.select root.DB.Users, (u) -> u.id == id
