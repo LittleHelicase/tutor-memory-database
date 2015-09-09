@@ -5,45 +5,51 @@ uuid = require 'node-uuid'
 
 
 module.exports = (root) ->
-  exists: (id) ->
+  exists: (pseudo) ->
     new Promise (resolve, reject) ->
-      user = _.select root.DB.Users, (u) -> u.id == id
+      user = _.select root.DB.Users, (u) -> u.pseudonym == pseudo
       if user.length == 1
         resolve true
       else if user.length == 0
         resolve false
       else
-        reject "DB inconsistency: The user #{id} exists multiple times"
+        reject "DB inconsistency: The user #{pseudo} exists multiple times"
+
+  getId: (pseudo) ->
+    new Promise (resolve, reject) ->
+      user = (_.select root.DB.Users, (u) -> u.pseudonym == pseudo)[0]
+      if user && user.id
+        resolve user.id
+      else
+        reject "User with pseudonym #{pseudo} does not exists"
 
   getPseudonym: (id) ->
     new Promise (resolve, reject) ->
       user = (_.select root.DB.Users, (u) -> u.id == id)[0]
       if user && user.pseudonym
         resolve user.pseudonym
-      else if user
-        reject "User #{id} has no pseudonym"
       else
-        reject "User #{id} does not exists"
+        reject "User with ID #{id} does not exists"
 
-  setPseudonym: (id, pseudonym) ->
+  setPseudonym: (pseudo, newPseudonym) ->
     new Promise (resolve, reject) ->
-      pseudonymUser = _.select root.DB.Users, (u) -> u.pseudonym == pseudonym
+      pseudonymUser = _.select root.DB.Users, (u) -> u.pseudonym == newPseudonym
       if pseudonymUser.length > 0
-        reject "Pseudonym #{pseudonym} already taken"
+        reject "Pseudonym #{newPseudonym} already taken"
         return
       selection = {}
       user = (_.select root.DB.Users, (u,idx) ->
-        if u.id == id
+        if u.pseudonym == pseudo
           selection.idx = idx
-        return u.id == id
+        return u.pseudonym == pseudo
       )
       if user.length == 1
-        root.DB.Users[selection.idx].pseudonym = pseudonym
+        root.DB.Users[selection.idx].pseudonym = newPseudonym
         resolve()
       else if user.length == 0
-        reject "User #{id} does not exists"
+        reject "User #{pseudo} does not exists"
       else
-        reject "DB inconsistency: The user #{id} exists multiple times"
+        reject "DB inconsistency: The user #{pseudo} exists multiple times"
 
   create: (id, matrikel, pseudonym) ->
     new Promise (resolve, reject) ->
