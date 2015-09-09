@@ -40,7 +40,7 @@ describe("Group queries", function(){
   it("creating a group of users should add others as pending", function(){
     var DB = {Groups:[]};
     db.Set(DB);
-    return db.Groups.createGroup(1,[1,2,3]).then(function(group){
+    return db.Groups.create(1,[1,2,3]).then(function(group){
       group.should.have.property("pendingUsers");
       group.pendingUsers.should.include.members([2,3]);
     });
