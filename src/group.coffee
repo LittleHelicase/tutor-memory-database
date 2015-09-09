@@ -28,7 +28,7 @@ module.exports = (root) ->
 
 
   # return
-  createGroup: (user_id, group_users) ->
+  create: (user_id, group_users) ->
     new Promise (resolve) ->
       # make sure the user is not in two groups at the same time
       leaveGroup user_id
@@ -54,7 +54,7 @@ module.exports = (root) ->
       resolve group
 
   # returns a list of groups with pending invitations
-  pendingGroups: (user_id) ->
+  pending: (user_id) ->
     new Promise (resolve) ->
       pending = _.select root.DB.Groups, (g) ->
         g.pendingUsers and _.includes g.pendingUsers, user_id
@@ -83,7 +83,7 @@ module.exports = (root) ->
 
       # return if the user is already in the group
       if _.includes group.users, user_id
-        resolve()
+        resolve group
         return
       # make sure the user is invited to the group
       if not group.pendingUsers or not _.includes group.pendingUsers, user_id
@@ -96,4 +96,4 @@ module.exports = (root) ->
       if group.pendingUsers.length == 0
         delete group.pendingUsers
       group.users.push user_id
-      resolve()
+      resolve group

@@ -33,7 +33,7 @@ describe("Group queries", function(){
   it("should be possible to create a group of users", function(){
     var DB = {Groups:[]};
     db.Set(DB);
-    return db.Groups.createGroup(1,[1,2,3]).then(function(group){
+    return db.Groups.create(1,[1,2,3]).then(function(group){
       group.users.should.deep.equal([1]);
     });
   });
@@ -50,7 +50,7 @@ describe("Group queries", function(){
                       {id:2,users:[4],pendingUsers:[2,3]},
                       {id:3,users:[7],pendingUsers:[1,3]}]};
     db.Set(DB);
-    return db.Groups.pendingGroups(2).then(function(pending){
+    return db.Groups.pending(2).then(function(pending){
       pending.should.have.length(2);
       pending.should.deep.include.members([{id:1,users:[1],pendingUsers:[2,3]},
                                           {id:2,users:[4],pendingUsers:[2,3]}]);
