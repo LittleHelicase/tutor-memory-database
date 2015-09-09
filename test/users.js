@@ -1,94 +1,72 @@
 
 var chai = require("chai");
+var chaiAsPromised = require("chai-as-promised");
+
+chai.use(chaiAsPromised);
 chai.should();
 
 var db = require("../lib/db")();
 
 describe("User queries", function(){
-  it("should be possible to query a user", function(done){
+  it("should be possible to query a user", function(){
     var DB = {Users:[{id:1}]};
     db.Set(DB);
 
-    db.Student.userExists(1,function(err,exists){
-      (err == null).should.be.true;
+    return db.Users.exists(1).then(function(exists){
       exists.should.be.true;
-      done();
     });
   });
-  it("should be possible to query a non existing user", function(done){
+  it("should be possible to query a non existing user", function(){
     var DB = {Users:[{id:1}]};
     db.Set(DB);
 
-    db.Student.userExists(2,function(err,exists){
-      (err == null).should.be.true;
+    return db.Users.exists(2).then(function(exists){
       exists.should.be.false;
-      done();
     });
   });
-  it("should detect broken user databases", function(done){
+  it("should detect broken user databases", function(){
     var DB = {Users:[{id:1},{id:1}]};
     db.Set(DB);
 
-    db.Student.userExists(1,function(err,exists){
-      (err == null).should.be.false;
-      done();
-    });
+    return db.Users.exists(1).should.be.rejected;
   });
-  it("should be possible to query a users pseudonym", function(done){
+  it("should be possible to query a users pseudonym", function(){
     var DB = {Users:[{id:1,pseudonym:"P"}]};
     db.Set(DB);
 
-    db.Student.getUserPseudonym(1,function(err,pseudonym){
-      (err == null).should.be.true;
+    return db.Users.getPseudonym(1).then(function(pseudonym){
       pseudonym.should.equal("P");
-      done();
     });
   });
-  it("should complain if the user has no pseudonym", function(done){
+  it("should complain if the user has no pseudonym", function(){
     var DB = {Users:[{id:1,wrongPseudo:"P"}]};
     db.Set(DB);
 
-    db.Student.getUserPseudonym(1,function(err,pseudonym){
-      (err == null).should.be.false;
-      (pseudonym == undefined).should.be.true;
-      done();
-    });
+    return db.Users.getPseudonym(1).should.be.rejected;
   });
-  it("should be possible to change a users pseudonym", function(done){
+  it("should be possible to change a users pseudonym", function(){
     var DB = {Users:[{id:1,pseudonym:"P"}]};
     db.Set(DB);
 
-    db.Student.setUserPseudonym(1,"Q",function(err){
-      (err == null).should.be.true;
-      db.Student.getUserPseudonym(1,function(err,pseudonym){
-        (err == null).should.be.true;
-        pseudonym.should.equal("Q");
-        done();
-      });
+    return db.Users.setPseudonym(1,"Q").then(function(){
+      DB.Users[0].pseudonym.should.equal("Q");
     });
   });
-  it("should be possible to create a new user", function(done){
-    var DB = {Users:[{}]};
+  it("should be possible to create a new user", function(){
+    var DB = {Users:[]};
     db.Set(DB);
 
-    db.Student.createUser(1,"12345678","P",function(err){
-      (err == null).should.be.true;
-      db.Student.getUserPseudonym(1,function(err,pseudonym){
-        (err == null).should.be.true;
-        pseudonym.should.equal("P");
-        done();
-      });
+    return db.Users.create(1,"12345678","P").then(function(){
+      DB.Users[0].pseudonym.should.equal("P");
+      DB.Users[0].id.should.equal(1);
+      DB.Users[0].matrikel.should.equal("12345678");
     });
   });
 
-  it("should not be possible to create two users with the same id", function(done){
+  it("should not be possible to create two users with the same id", function(){
     var DB = {Users:[{id:1,pseudonym:"P"}]};
     db.Set(DB);
 
-    db.Student.createUser(1,"12345678","P",function(err){
-      (err == null).should.be.false;
-      db.Get(DB).Users.length.should.equal(1);
-      done();
-    });
+    return db.Users.create(1,"12345678","P").should.be.rejected;
   });
 });

@@ -15,4 +15,6 @@ module.exports = (config) ->
     fs.writeFileSync toFile, JSON.stringify root.DB
 
   Student: (require './student_queries')(root)
-  Group: (require './group')(root)
+  Exercises: (require './exercises')(root)
+  Users: (require './users')(root)
+  Groups: (require './group')(root)
