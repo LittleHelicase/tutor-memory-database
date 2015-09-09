@@ -3,12 +3,6 @@ _ = require 'lodash'
 moment = require 'moment'
 uuid = require 'node-uuid'
 
-groupForUser = (user, DB) ->
-  group = _.filter DB.Groups, (g) ->
-    _.includes g.users, user
-  if group.length != 1
-    return -1
-  group[0]
 
 module.exports = (root) ->
   # Returns all exercises. Expired and active ones.
@@ -59,14 +53,6 @@ module.exports = (root) ->
         .first()
         .value()
 
-  # get the Group of one user
-  getGroupForUser: (user_id, result) ->
-    group = groupForUser user_id, root.DB
-    if group == -1
-      result "Could not find a group for user with ID #{user_id}"
-      return
-    result null, group
-
   # Total points for current user
   getTotalPoints: (user_id, result) ->
     group = groupForUser user_id, root.DB
@@ -83,84 +69,6 @@ module.exports = (root) ->
 
   # set the solution for a group
   setSolution: (group_id, solution, result) ->
-
-
-  # removes a user from a group, creates a new (one man) group
-  # and copies all the results to the new user
-  leaveGroup: (user_id, result) ->
-    # get current group
-    group = groupForUser user_id, root.DB
-    if group.users.length == 1
-      result "It is not possible to leave a one-user group (uid=#{user_id},gid=#{group.id})."
-      return
-
-    # create a clone group
-    newGroup = _.cloneDeep group
-
-    # remove user from group
-    _.remove group.users, (u) -> u == user_id
-
-    # new group only contains the one user! and gets a new id
-    newGroup.users = [user_id]
-    newGroup.id = uuid.v4()
-
-    # insert new Group
-    root.DB.Groups.push newGroup
-
-    # copy results from old group to new group
-    groupResults = _(root.DB.Results).chain()
-      .filter (res) -> res.group == group.id
-      .map (res) -> res.group = newGroup.id; return res
-      .value()
-
-    # insert results for new group
-    root.DB.Results.push groupResults
-    result null, newGroup
-
-  # creates a group with specified users
-  ### old version only accepting users in no group
-  createGroup: (user_id, group_users, result) ->
-    usersInGroup = _(group_users).chain()
-      .reject (id) -> id == user_id   # the creator immediatley joins the group
-      .map _.partial groupForUser, _, root.DB
-      .map (g,idx) -> if g==-1 then null else users_ids[idx]
-      .compact()
-      .value()
-    if usersInGroup.length != 0
-      result "The users #{users_ids} are already in a group"
-      return
-
-    newGroup =
-      id: uuid.v4()
-      users: users_ids
-    root.DB.Groups.push newGroup
-    result null, newGroup
-  ###
-
-  createGroup: (user_id, group_users, result) ->
-    # the creator immediatley joins the group
-    pending = _.reject group_users, (id) -> id == user_id
-
-    newGroup =
-      id: uuid.v4()
-      users: [user_id]
-    if pending.length > 0
-      newGroup.pendingUsers = pending
-    root.DB.Groups.push newGroup
-    result null, newGroup
-
-  # returns a list of groups with pending invitations
-  getPendingGroups: (user_id, result) ->
-    
-
-  joinGroup: (user_id, group_id, result) ->
-    group = _.filter root.DB.Groups, id: group_id
-    if group.length > 1
-      result "Inconsistent groups. Multiple groups with ID: #{group_id}"
-      return
-    if group.length < 0
-      result "Cannot join non existing group (ID: #{group_id})"
-      return
 
 
   userExists: (id, result) ->
