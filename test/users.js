@@ -9,7 +9,7 @@ var db = require("../lib/db")();
 
 describe("User queries", function(){
   it("should be possible to query a user", function(){
-    var DB = {Users:[{pseudonym:1}]};
+    var DB = {Users:[{id:1}]};
     db.Set(DB);
 
     return db.Users.exists(1).then(function(exists){
@@ -17,7 +17,7 @@ describe("User queries", function(){
     });
   });
   it("should be possible to query a non existing user", function(){
-    var DB = {Users:[{pseudonym:1}]};
+    var DB = {Users:[{id:1}]};
     db.Set(DB);
 
     return db.Users.exists(2).then(function(exists){
@@ -25,18 +25,10 @@ describe("User queries", function(){
     });
   });
   it("should detect broken user databases", function(){
-    var DB = {Users:[{pseudonym:1},{pseudonym:1}]};
+    var DB = {Users:[{id:1},{id:1}]};
     db.Set(DB);
 
     return db.Users.exists(1).should.be.rejected;
-  });
-  it("should be possible to query a users id", function(){
-    var DB = {Users:[{id:1,pseudonym:"P"}]};
-    db.Set(DB);
-
-    return db.Users.getId("P").then(function(pseudonym){
-      pseudonym.should.equal(1);
-    });
   });
   it("should be possible to query a users pseudonym", function(){
     var DB = {Users:[{id:1,pseudonym:"P"}]};
@@ -47,10 +39,10 @@ describe("User queries", function(){
     });
   });
   it("should be possible to change a users pseudonym", function(){
-    var DB = {Users:[{pseudonym:"P"}]};
+    var DB = {Users:[{id:1,pseudonym:"P"}]};
     db.Set(DB);
 
-    return db.Users.setPseudonym("P","Q").then(function(){
+    return db.Users.setPseudonym(1,"Q").then(function(){
       DB.Users[0].pseudonym.should.equal("Q");
     });
   });

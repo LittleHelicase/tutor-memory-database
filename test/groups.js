@@ -13,7 +13,7 @@ describe("Group queries", function(){
       {id:1,users:[1,5]},
       {id:2,users:[2,3]},
       {id:3,users:[4]}
-    ]};
+    ], Users:[{id:1,pseudonym:1}]};
     db.Set(DB);
 
     return db.Groups.getGroupForUser(1).then(function(group){
@@ -25,30 +25,39 @@ describe("Group queries", function(){
       {id:1,users:[1,5]},
       {id:2,users:[2,1]},
       {id:3,users:[4]}
-    ]};
+    ], Users:[{id:1,pseudonym:1}]};
     db.Set(DB);
 
     return db.Groups.getGroupForUser(1).should.be.rejected;
   });
   it("should be possible to create a group of users", function(){
-    var DB = {Groups:[]};
+    var DB = {Groups:[], Users:[
+      {id:1,pseudonym:"A"},
+      {id:2,pseudonym:"B"},
+      {id:3,pseudonym:"C"}
+    ]};
     db.Set(DB);
-    return db.Groups.create(1,[1,2,3]).then(function(group){
-      group.users.should.deep.equal([1]);
+    return db.Groups.create(1,["A","B","C"]).then(function(group){
+      group.users.should.deep.equal(["A"]);
     });
   });
   it("creating a group of users should add others as pending", function(){
-    var DB = {Groups:[]};
+    var DB = {Groups:[], Users:[
+      {id:1,pseudonym:"A"},
+      {id:2,pseudonym:"B"},
+      {id:3,pseudonym:"C"}
+    ]};
     db.Set(DB);
-    return db.Groups.create(1,[1,2,3]).then(function(group){
+    return db.Groups.create(1,["A","B","C"]).then(function(group){
       group.should.have.property("pendingUsers");
-      group.pendingUsers.should.include.members([2,3]);
+      group.pendingUsers.should.include.members(["B","C"]);
     });
   });
   it("should return all pending group invitations", function(){
     var DB = {Groups:[{id:1,users:[1],pendingUsers:[2,3]},
                       {id:2,users:[4],pendingUsers:[2,3]},
-                      {id:3,users:[7],pendingUsers:[1,3]}]};
+                      {id:3,users:[7],pendingUsers:[1,3]}],
+              Users: [{id:2,pseudonym:2}]};
     db.Set(DB);
     return db.Groups.pending(2).then(function(pending){
       pending.should.have.length(2);
@@ -59,7 +68,8 @@ describe("Group queries", function(){
   it("should be able to join a group with an invitation", function(){
     var DB = {Groups:[{id:1,users:[1],pendingUsers:[2,3]},
                       {id:2,users:[4],pendingUsers:[2,3]},
-                      {id:3,users:[7],pendingUsers:[1,3]}]};
+                      {id:3,users:[7],pendingUsers:[1,3]}],
+              Users: [{id:2,pseudonym:2}]};
     db.Set(DB);
     return db.Groups.joinGroup(2, 2).then(function(){
       DB.Groups[1].users.should.have.length(2);
@@ -68,21 +78,24 @@ describe("Group queries", function(){
   it("should not be possible to join a group without an invitation", function(){
     var DB = {Groups:[{id:1,users:[1],pendingUsers:[2,3]},
                       {id:2,users:[4],pendingUsers:[2,3]},
-                      {id:3,users:[7],pendingUsers:[1,3]}]};
+                      {id:3,users:[7],pendingUsers:[1,3]}],
+              Users: [{id:2,pseudonym:2}]};
     db.Set(DB);
     return db.Groups.joinGroup(2, 3).should.be.rejected;
   });
   it("should not be possible to join a non existing group", function(){
     var DB = {Groups:[{id:1,users:[1],pendingUsers:[2,3]},
                       {id:2,users:[4],pendingUsers:[2,3]},
-                      {id:3,users:[7],pendingUsers:[1,3]}]};
+                      {id:3,users:[7],pendingUsers:[1,3]}],
+              Users: [{id:2,pseudonym:2}]};
     db.Set(DB);
     return db.Groups.joinGroup(2, 151).should.be.rejected;
   });
   it("should be able to reject a group invitation", function(){
     var DB = {Groups:[{id:1,users:[1],pendingUsers:[2,3]},
                       {id:2,users:[4],pendingUsers:[2,3]},
-                      {id:3,users:[7],pendingUsers:[1,3]}]};
+                      {id:3,users:[7],pendingUsers:[1,3]}],
+              Users: [{id:2,pseudonym:2}]};
     db.Set(DB);
     return db.Groups.rejectInvitation(2, 2).then(function(){
       DB.Groups[1].pendingUsers.should.have.length(1);

@@ -5,23 +5,15 @@ uuid = require 'node-uuid'
 
 
 module.exports = (root) ->
-  exists: (pseudo) ->
+  exists: (id) ->
     new Promise (resolve, reject) ->
-      user = _.select root.DB.Users, (u) -> u.pseudonym == pseudo
+      user = _.select root.DB.Users, (u) -> u.id == id
       if user.length == 1
         resolve true
       else if user.length == 0
         resolve false
       else
-        reject "DB inconsistency: The user #{pseudo} exists multiple times"
-
-  getId: (pseudo) ->
-    new Promise (resolve, reject) ->
-      user = (_.select root.DB.Users, (u) -> u.pseudonym == pseudo)[0]
-      if user && user.id
-        resolve user.id
-      else
-        reject "User with pseudonym #{pseudo} does not exists"
+        reject "DB inconsistency: The user with ID #{id} exists multiple times"
 
   getPseudonym: (id) ->
     new Promise (resolve, reject) ->
@@ -31,7 +23,7 @@ module.exports = (root) ->
       else
         reject "User with ID #{id} does not exists"
 
-  setPseudonym: (pseudo, newPseudonym) ->
+  setPseudonym: (id, newPseudonym) ->
     new Promise (resolve, reject) ->
       pseudonymUser = _.select root.DB.Users, (u) -> u.pseudonym == newPseudonym
       if pseudonymUser.length > 0
@@ -39,17 +31,17 @@ module.exports = (root) ->
         return
       selection = {}
       user = (_.select root.DB.Users, (u,idx) ->
-        if u.pseudonym == pseudo
+        if u.id == id
           selection.idx = idx
-        return u.pseudonym == pseudo
+        return u.id == id
       )
       if user.length == 1
         root.DB.Users[selection.idx].pseudonym = newPseudonym
         resolve()
       else if user.length == 0
-        reject "User #{pseudo} does not exists"
+        reject "User #{id} does not exists"
       else
-        reject "DB inconsistency: The user #{pseudo} exists multiple times"
+        reject "DB inconsistency: The user #{id} exists multiple times"
 
   create: (id, matrikel, pseudonym) ->
     new Promise (resolve, reject) ->

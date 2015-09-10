@@ -26,10 +26,19 @@ module.exports = (root) ->
       return -1
     group[0]
 
+  pseudonymForUser = (id) ->
+    user = _.filter root.DB.Users, (u) -> u.id == id
+    if user.length != 1
+      return -1
+    user[0].pseudonym
+
 
   # return
-  create: (user_pseudo, group_users) ->
-    new Promise (resolve) ->
+  create: (user_id, group_users) ->
+    new Promise (resolve, reject) ->
+      user_pseudo = pseudonymForUser user_id
+      if user_pseudo == -1
+        reject "Unable to identify user with ID #{user_id}"
       # make sure the user is not in two groups at the same time
       leaveGroup user_pseudo
 
@@ -45,8 +54,11 @@ module.exports = (root) ->
       resolve newGroup
 
   # get the Group of one user
-  getGroupForUser: (user_pseudo) ->
+  getGroupForUser: (user_id) ->
     new Promise (resolve, reject) ->
+      user_pseudo = pseudonymForUser user_id
+      if user_pseudo == -1
+        reject "Unable to identify user with ID #{user_id}"
       group = groupForUser user_pseudo, root.DB
       if group == -1
         reject "Could not find a group for user with Pseudonym #{user_pseudo}"
@@ -54,14 +66,20 @@ module.exports = (root) ->
       resolve group
 
   # returns a list of groups with pending invitations
-  pending: (user_pseudo) ->
+  pending: (user_id) ->
     new Promise (resolve) ->
+      user_pseudo = pseudonymForUser user_id
+      if user_pseudo == -1
+        reject "Unable to identify user with ID #{user_id}"
       pending = _.select root.DB.Groups, (g) ->
         g.pendingUsers and _.includes g.pendingUsers, user_pseudo
       resolve pending
 
-  rejectInvitation: (user_pseudo, group_id) ->
+  rejectInvitation: (user_id, group_id) ->
     new Promise (resolve, reject) ->
+      user_pseudo = pseudonymForUser user_id
+      if user_pseudo == -1
+        reject "Unable to identify user with ID #{user_id}"
       group = _.filter root.DB.Groups, id: group_id
       if group.length > 1 or group.length == 0
         resolve()
@@ -72,8 +90,11 @@ module.exports = (root) ->
         group.pendingUsers = _.reject group.pendingUsers, (pseudo) -> user_pseudo == pseudo
       resolve()
 
-  joinGroup: (user_pseudo, group_id) ->
+  joinGroup: (user_id, group_id) ->
     new Promise (resolve, reject) ->
+      user_pseudo = pseudonymForUser user_id
+      if user_pseudo == -1
+        reject "Unable to identify user with ID #{user_id}"
       group = _.filter root.DB.Groups, id: group_id
       if group.length > 1 or  group.length <= 0
         reject "Inconsistent groups. Multiple groups with ID: #{group_id}"
