@@ -17,4 +17,5 @@ module.exports = (config) ->
   Student: (require './student_queries')(root)
   Exercises: (require './exercises')(root)
   Users: (require './users')(root)
-  Groups: (require './group')(root)
+  Groups: (require './groups')(root)
+  Corrections: (require './corrections')(root)
