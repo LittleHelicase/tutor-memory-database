@@ -8,6 +8,7 @@ module.exports =
         group: "af3fb55a-4b6f-11e5-90ba-685b35b5d746"
         exercise: "ee256059-9d92-4774-9db2-456378e04586"
         task: "f4ca6e7e-3f6e-11e5-8359-685b35b5d746"
+        corrector: "mklein"
         points: 5
         data: [] # contains correction information
       },
@@ -15,6 +16,7 @@ module.exports =
         group: "af3fb55a-4b6f-11e5-90ba-685b35b5d746"
         exercise: "ee256059-9d92-4774-9db2-456378e04586"
         task: "ff7f08de-3f6e-11e5-9b7e-685b35b5d746"
+        corrector: "few"
         points: 10
         data: [] # contains correction information
       },
@@ -22,8 +24,34 @@ module.exports =
         group: "af3fb55a-4b6f-11e5-90ba-685b35b5d746"
         exercise: "ee256059-9d92-4774-9db2-456378e04586"
         task: "0801fe80-3f6f-11e5-abbc-685b35b5d746"
+        corrector: "XY"
         points: 0.5
         data: [] # contains correction information
+      }
+    ]
+  Solutions:
+    [
+      {
+        group: "af3fb55a-4b6f-11e5-90ba-685b35b5d746"
+        exercise: "ee256059-9d92-4774-9db2-456378e04586"
+        pdf: ""
+        explicit: true
+        solutions: [
+          "$$\\mathcal O(n)$$",
+          "```dot digraph....```",
+          "Bla bla"
+        ]
+      },
+      {
+        group: "fd8c6b08-572d-11e5-9824-685b35b5d746"
+        exercise: "ee256059-9d92-4774-9db2-456378e04586"
+        pdf: ""
+        explicit: false
+        soluitions: [
+          "$$\\mathcal O(n^2)$$",
+          "A->B,C->B ...",
+          "War viel zu schwer, nicht bearbeitet"
+        ]
       }
     ]
   Exercises:
@@ -107,7 +135,7 @@ module.exports =
       {
         name: "pending group"
         id: "fd8c6b08-572d-11e5-9824-685b35b5d746"
-        users: []
+        users: ["Tiny Knuth"]
         pendingUsers: ["Lazy Dijkstra"]
       }
     ]

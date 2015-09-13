@@ -71,4 +71,38 @@ describe("Student Exercise Queries", function(){
       ex.id.should.equal("abc");
     });
   });
+
+  it("should be able to get the solution for an exercise", function(){
+    var DB = {Solutions:[
+      {group:"A",exercise: 1,solutions:["text","textA"]},
+      {group:2,exercise: 1,solutions:["text2","textA2"]},
+      {group:1,exercise: 2,solutions:["text3","textA3"]},
+      {group:"A",exercise: 2,solutions:["text3","textA3"]}
+    ], Groups: [
+      {id: "A", users: [ 1 ]}
+    ]};
+    db.Set(DB);
+
+    return db.Exercises.getExerciseSolutions(1,1).then(function(sol){
+      (Array.isArray(sol)).should.be.false;
+      sol.solutions.should.deep.include.members(["text","textA"])
+    });
+  });
+
+  it("a non existing solution should return an empty object", function(){
+    var DB = {Solutions:[
+      {group:"B",exercise: 1,solutions:["text","textA"]},
+      {group:2,exercise: 1,solutions:["text2","textA2"]},
+      {group:1,exercise: 2,solutions:["text3","textA3"]},
+      {group:"A",exercise: 2,solutions:["text3","textA3"]}
+    ], Groups: [
+      {id: "A", users: [ 1 ]}
+    ]};
+    db.Set(DB);
+
+    return db.Exercises.getExerciseSolutions(1,1).then(function(sol){
+      (sol == null).should.be.false;
+      sol.solutions.should.have.length(0);
+    });
+  });
 });

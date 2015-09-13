@@ -3,40 +3,21 @@
 _ = require 'lodash'
 moment = require 'moment'
 uuid = require 'node-uuid'
-
-groupForUser = (user, DB) ->
-  group = _.filter DB.Groups, (g) ->
-    _.includes g.users, user
-  if group.length != 1
-    return -1
-  group[0]
+utils = require './utils'
 
 module.exports = (root) ->
   # destructive removale of user. Make sure to insert him into another group afterwards
   leaveGroup = (user_pseudo) ->
-    group = groupForUser user_pseudo, root.DB
+    group = utils.groupForUser user_pseudo, root.DB
 
     # remove user from group
     _.remove group.users, (u) -> u == user_pseudo
-
-  groupForUser = (user_pseudo) ->
-    group = _.filter root.DB.Groups, (g) ->
-      _.includes g.users, user_pseudo
-    if group.length != 1
-      return -1
-    group[0]
-
-  pseudonymForUser = (id) ->
-    user = _.filter root.DB.Users, (u) -> u.id == id
-    if user.length != 1
-      return -1
-    user[0].pseudonym
 
 
   # return
   create: (user_id, group_users) ->
     new Promise (resolve, reject) ->
-      user_pseudo = pseudonymForUser user_id
+      user_pseudo =utils.pseudonymForUser user_id, root.DB
       if user_pseudo == -1
         reject "Unable to identify user with ID #{user_id}"
       # make sure the user is not in two groups at the same time
@@ -56,10 +37,10 @@ module.exports = (root) ->
   # get the Group of one user
   getGroupForUser: (user_id) ->
     new Promise (resolve, reject) ->
-      user_pseudo = pseudonymForUser user_id
+      user_pseudo = utils.pseudonymForUser user_id, root.DB
       if user_pseudo == -1
         reject "Unable to identify user with ID #{user_id}"
-      group = groupForUser user_pseudo, root.DB
+      group = utils.groupForUser user_pseudo, root.DB
       if group == -1
         reject "Could not find a group for user with Pseudonym #{user_pseudo}"
         return
@@ -68,7 +49,7 @@ module.exports = (root) ->
   # returns a list of groups with pending invitations
   pending: (user_id) ->
     new Promise (resolve) ->
-      user_pseudo = pseudonymForUser user_id
+      user_pseudo = utils.pseudonymForUser user_id, root.DB
       if user_pseudo == -1
         reject "Unable to identify user with ID #{user_id}"
       pending = _.select root.DB.Groups, (g) ->
@@ -77,7 +58,7 @@ module.exports = (root) ->
 
   rejectInvitation: (user_id, group_id) ->
     new Promise (resolve, reject) ->
-      user_pseudo = pseudonymForUser user_id
+      user_pseudo = utils.pseudonymForUser user_id, root.DB
       if user_pseudo == -1
         reject "Unable to identify user with ID #{user_id}"
       group = _.filter root.DB.Groups, id: group_id
@@ -92,7 +73,7 @@ module.exports = (root) ->
 
   joinGroup: (user_id, group_id) ->
     new Promise (resolve, reject) ->
-      user_pseudo = pseudonymForUser user_id
+      user_pseudo = utils.pseudonymForUser user_id, root.DB
       if user_pseudo == -1
         reject "Unable to identify user with ID #{user_id}"
       group = _.filter root.DB.Groups, id: group_id
