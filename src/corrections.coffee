@@ -13,14 +13,58 @@ module.exports = (root) ->
 
   # returns for every active exercise how many are worked on / not corrected
   # and already corrected
-  getStatus: ->
-    new Promise (resolve, reject) ->
+  API =
+    getStatus: ->
+      new Promise (resolve, reject) ->
+        exercises = _.filter root.DB.Exercises, (e) -> moment().isAfter ex.activationDate
+        solutions = root.DB.solutions
 
+    getSolutionsForExercise: (exercise_id) ->
+      new Promise (resolve, reject) ->
+        solutions = _.filter root.DB.Solutions, (s) -> s.exercise == exercise_id
+        resolve solutions
 
-  getNumPending: (exercise_id) ->
-    new Promise (resolve, reject) ->
-      pending = _(root.DB.Solutions).chain()
+    lockSolutionForTutor: (exercise_id, group_id, tutor) ->
+      new Promise (resolve, reject) ->
+        s_idx = -1
+        solution = _.select root.DB.Solutions, (s, idx) ->
+          searched = s.exercise == exercise_id and s.group == group_id
+          if searched
+            s_idx = idx
+          return searched
+        if solution.length == 0
+          reject "Cannot lock non existing Solution (exercise: #{exercises_id}, group: #{group_id})"
+        else if solution.length > 1
+          reject "DB inconsistency, solution exists multiple times (exercise: #{exercises_id}, group: #{group_id})"
+        else if solution[0].lock and solution[0].lock != tutor
+          reject "Solution already locked for #{solution[0].lock}"
+        else if hasResult solution[0]
+          reject "Solution already has a result"
+        else
+          root.DB.Solutions[s_idx].lock = tutor
+          resolve solution
+
+    lockNextSolutionForTutor: (exercise_num, tutor) ->
+      exercise_id = _(root.DB.Exercises).chain()
+        .select (e) -> e.number == exercise_num
+        .pluck "id"
+        .first()
+        .value()
+      solution = _(root.DB.Solutions).chain()
         .select (s) -> s.exercise == exercise_id
         .reject hasResult
+        .sample()
         .value()
-      resolve pending.length
+
+      if !solution?
+        Promise.reject "No pending solutions to lock"
+      else
+        API.lockSolutionForTutor(solution.exercise, solution.group, tutor)
+
+    getNumPending: (exercise_id) ->
+      new Promise (resolve, reject) ->
+        pending = _(root.DB.Solutions).chain()
+          .select (s) -> s.exercise == exercise_id
+          .reject hasResult
+          .value()
+        resolve pending.length
