@@ -11,17 +11,48 @@ module.exports = (root) ->
       r.group == solution.group and r.exercise == solution.exercise
     return result.length == 1
 
-  # returns for every active exercise how many are worked on / not corrected
-  # and already corrected
+  exerciseIDForNum = (number) ->
+    _(root.DB.Exercises).chain()
+      .select (e) -> e.number == exercise_num
+      .pluck "id"
+      .first()
+      .value()
+
   API =
+    # returns for every active exercise how many are worked on / not corrected
+    # and already corrected
+    # [
+    #  {exercise: 1, solutions: 100, corrected: 50, locked: 10}
+    # ]
     getStatus: ->
+      exercises = _.filter root.DB.Exercises, (e) -> moment().isAfter e.activationDate
+      status = _.map exercises, (e) ->
+        Promise.all([
+          API.getResultsForExercise(e.id),
+          API.getSolutionsForExercise(e.id)
+          # getLockedExercises(e.id)
+        ]).then (values) ->
+          exercise: e.id, solutions: values[1].length, corrected: values[0].length
+      Promise.all status
+
+
+    # get locked exercise for tutor
+
+    # get the list of all results for an exercise
+    getResultsForExercise: (exercise_id) ->
       new Promise (resolve, reject) ->
-        exercises = _.filter root.DB.Exercises, (e) -> moment().isAfter ex.activationDate
-        solutions = root.DB.solutions
+        ex_results = _.filter root.DB.Results, (r) -> exercise_id == r.exercise
+        resolve ex_results
 
     getSolutionsForExercise: (exercise_id) ->
       new Promise (resolve, reject) ->
         solutions = _.filter root.DB.Solutions, (s) -> s.exercise == exercise_id
+        resolve solutions
+
+    getLockedSolutionsForExercise: (exercise_id) ->
+      new Promise (resolve, reject) ->
+        solutions = _.filter root.DB.Solutions, (s) ->
+          s.exercise == exercise_id and s.lock?
         resolve solutions
 
     lockSolutionForTutor: (exercise_id, group_id, tutor) ->
@@ -44,12 +75,7 @@ module.exports = (root) ->
           root.DB.Solutions[s_idx].lock = tutor
           resolve solution
 
-    lockNextSolutionForTutor: (exercise_num, tutor) ->
-      exercise_id = _(root.DB.Exercises).chain()
-        .select (e) -> e.number == exercise_num
-        .pluck "id"
-        .first()
-        .value()
+    lockNextSolutionForTutor: (exercise_id, tutor) ->
       solution = _(root.DB.Solutions).chain()
         .select (s) -> s.exercise == exercise_id
         .reject hasResult

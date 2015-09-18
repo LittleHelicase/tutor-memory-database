@@ -1,6 +1,7 @@
 
 var chai = require("chai");
 var chaiAsPromised = require("chai-as-promised");
+var moment = require("moment");
 
 chai.use(chaiAsPromised);
 chai.should();
@@ -69,8 +70,7 @@ describe("Corretion methods", function(){
   });
   it("should lock a random not corrected solution", function(){
     var DB = {Solutions: [{exercise:1, group:1},{exercise:1,group:2}],
-      Results: [{exercise:1, group: 1}],
-      Exercises: [{number:1,id:1}]};
+      Results: [{exercise:1, group: 1}]};
     db.Set(DB);
 
     return db.Corrections.lockNextSolutionForTutor(1,"tutor").then(function(){
@@ -80,10 +80,29 @@ describe("Corretion methods", function(){
 
   it("should fail if no exercise could be locked", function(){
     var DB = {Solutions: [{exercise:1, group:1},{exercise:2,group:2}],
-      Results: [{exercise:1, group: 1}],
-      Exercises: [{number:1,id:1}]};
+      Results: [{exercise:1, group: 1}]};
     db.Set(DB);
 
     return db.Corrections.lockNextSolutionForTutor(3,"tutor").should.be.rejected;
+  });
+  it("has a method returning the correction status of all exercises", function(){
+    var DB = {Solutions:[
+      {exercise: 1, group: 1},
+      {exercise: 1, group: 2},
+      {exercise: 2, group: 1},
+      {exercise: 2, group: 2}
+    ],Results: [
+      {exercise: 1, group: 1}
+    ],Exercises:[
+      {id: 1, activationDate: moment().subtract(1, "days")},
+      {id: 2, activationDate: moment().subtract(1, "days")}
+    ]};
+    db.Set(DB);
+
+    return db.Corrections.getStatus().then(function(status){
+      status.should.have.length(2);
+      status.should.deep.include.members([{exercise:1,solutions:2,corrected:1},
+            {exercise:2,solutions:2,corrected:0}])
+    })
   });
 });
