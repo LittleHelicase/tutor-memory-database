@@ -19,3 +19,4 @@ module.exports = (config) ->
   Users: (require './users')(root)
   Groups: (require './groups')(root)
   Corrections: (require './corrections')(root)
+  Manage: (require './manage')(root)
