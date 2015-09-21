@@ -40,9 +40,7 @@ describe("Student Exercise Queries", function(){
     ]};
     db.Set(DB);
 
-    return db.Exercises.getById(2).then(function(ex){
-      (ex == null).should.be.true;
-    });
+    return db.Exercises.getById(2).should.be.rejected;
   });
 
   it("should be able to query all active exercises", function(){
@@ -69,6 +67,21 @@ describe("Student Exercise Queries", function(){
     return db.Exercises.getDetailed("abc").then(function(ex){
       (Array.isArray(ex)).should.be.false;
       ex.id.should.equal("abc");
+    });
+  });
+
+  it("should hide task information for a normal exercise query", function(){
+    var DB = {
+      Exercises:[
+        {id:"abc",activationDate: moment().subtract(2, 'days').toJSON(),tasks:[],solutions:[]}
+      ]
+    };
+    db.Set(DB);
+    return db.Exercises.getById("abc").then(function(ex){
+      (Array.isArray(ex)).should.be.false;
+      ex.id.should.equal("abc");
+      ex.should.not.have.key("tasks");
+      ex.should.not.have.key("solutions");
     });
   });
 

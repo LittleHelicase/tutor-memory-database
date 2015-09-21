@@ -14,7 +14,8 @@ module.exports = (root) ->
           .filter (ex) -> moment().isAfter ex.activationDate
           .map (ex) ->
             exNew = _.clone ex
-            exNew.tasks = _.map ex.tasks, (t) -> t.id
+            delete exNew.tasks
+            delete exNew.solutions
             exNew
           .value())
 
@@ -22,16 +23,21 @@ module.exports = (root) ->
   # Returns a specific exercise by id
   getById: (id) ->
     new Promise (resolve) ->
-      resolve( _(root.DB.Exercises).chain()
+      res = _(root.DB.Exercises).chain()
           .filter (ex) ->
             moment().isAfter ex.activationDate
           .filter id: id
           .map (ex) ->
             exNew = _.clone ex
-            exNew.tasks = _.map ex.tasks, (t) -> t.id
+            delete exNew.tasks
+            delete exNew.solutions
             exNew
           .first()
-          .value())
+          .value()
+      if res
+        resolve res
+      else
+        reject
 
   # Returns all exercises which can still be edited
   # expirationDate > now()
@@ -41,7 +47,11 @@ module.exports = (root) ->
         .filter (ex) ->
           (moment().isAfter ex.activationDate) and
           moment().isBefore ex.dueDate
-        .map (ex) -> (ex.tasks = _.map ex.tasks, (t) -> t.id); ex
+        .map (ex) ->
+          exNew = _.clone ex
+          delete exNew.tasks
+          delete exNew.solutions
+          exNew
         .value())
 
   # Exercise containing the tasks
@@ -51,6 +61,10 @@ module.exports = (root) ->
           .filter (ex) ->
             moment().isAfter ex.activationDate
           .filter id: id
+          .map (ex) ->
+            exNew = _.clone ex
+            delete exNew.solutions
+            exNew
           .first()
           .value())
 
