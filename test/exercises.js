@@ -87,18 +87,23 @@ describe("Student Exercise Queries", function(){
 
   it("should be able to get the solution for an exercise", function(){
     var DB = {Solutions:[
-      {group:"A",exercise: 1,solutions:["text","textA"]},
-      {group:2,exercise: 1,solutions:["text2","textA2"]},
-      {group:1,exercise: 2,solutions:["text3","textA3"]},
-      {group:"A",exercise: 2,solutions:["text3","textA3"]}
+      {group:"A",exercise: 1,solution:["text","textA"]},
+      {group:2,exercise: 1,solution:["text2","textA2"]},
+      {group:1,exercise: 2,solution:["text3","textA3"]},
+      {group:"A",exercise: 2,solution:["text3","textA3"]}
     ], Groups: [
       {id: "A", users: [ 1 ]}
+    ], Users: [
+      {id: 1, pseudonym: 1}
+    ], Exercises: [
+      {id: 1,
+        activationDate: moment().subtract(7,"days").toJSON(),
+        dueDate: moment().add(1, "days").toJSON()}
     ]};
     db.Set(DB);
-
-    return db.Exercises.getExerciseSolutions(1,1).then(function(sol){
+    return db.Exercises.getExerciseSolution(1,1).then(function(sol){
       (Array.isArray(sol)).should.be.false;
-      sol.solutions.should.deep.include.members(["text","textA"])
+      sol.solution.should.deep.include.members(["text","textA"])
     });
   });
 
@@ -110,12 +115,87 @@ describe("Student Exercise Queries", function(){
       {group:"A",exercise: 2,solutions:["text3","textA3"]}
     ], Groups: [
       {id: "A", users: [ 1 ]}
+    ], Users: [
+      {id: 1, pseudonym: 1}
+    ], Exercises: [
+      {id: 1,
+        activationDate: moment().subtract(7,"days").toJSON(),
+        dueDate: moment().add(1, "days").toJSON()}
     ]};
     db.Set(DB);
-
-    return db.Exercises.getExerciseSolutions(1,1).then(function(sol){
-      (sol == null).should.be.false;
-      sol.solutions.should.have.length(0);
+    return db.Exercises.getExerciseSolution(1,1).then(function(sol){
+      (sol == null).should.be.true;
     });
+  });
+
+  it("should add a solution if there is none", function(){
+    var DB = {Solutions:[],Groups: [
+      {id: "A", users: [ 1 ]}
+    ], Users: [
+      {id: 1, pseudonym: 1}
+    ], Exercises: [
+      {id: 1,
+        activationDate: moment().subtract(7,"days").toJSON(),
+        dueDate: moment().add(1, "days").toJSON()}
+    ]};
+    db.Set(DB);
+    return db.Exercises.setExerciseSolution(1,1,["abc","cde"]).then(function(){
+      return db.Exercises.getExerciseSolution(1,1).then(function(sol){
+        (Array.isArray(sol)).should.be.false;
+        sol.solution.should.deep.include.members(["abc","cde"])
+      });
+    });
+  });
+  it("should update a solution if there is one", function(){
+    var DB = {Solutions:[
+      {group:"A",exercise: 1,solution:["text","textA"]}
+    ], Groups: [
+      {id: "A", users: [ 1 ]}
+    ], Users: [
+      {id: 1, pseudonym: 1}
+    ], Exercises: [
+      {id: 1,
+        activationDate: moment().subtract(7,"days").toJSON(),
+        dueDate: moment().add(1, "days").toJSON()}
+    ]};
+    db.Set(DB);
+    return db.Exercises.setExerciseSolution(1,1,["abc","cde"]).then(function(){
+      return db.Exercises.getExerciseSolution(1,1).then(function(sol){
+        (Array.isArray(sol)).should.be.false;
+        sol.solution.should.deep.include.members(["abc","cde"])
+      });
+    });
+  });
+
+  it("should not update a solution if the exercise has expired", function(){
+    var DB = {Solutions:[
+      {group:"A",exercise: 1,solution:["text","textA"]}
+    ], Groups: [
+      {id: "A", users: [ 1 ]}
+    ], Users: [
+      {id: 1, pseudonym: 1}
+    ], Exercises: [
+      {id: 1,
+        activationDate: moment().subtract(7,"days").toJSON(),
+        dueDate: moment().subtract(1, "days").toJSON()}
+    ]};
+    db.Set(DB);
+    return db.Exercises.setExerciseSolution(1,1,["abc","cde"]).should.be.rejected;
+  });
+
+  it("should not update a solution for a not-yet active exercise", function(){
+    var DB = {Solutions:[
+      {group:"A",exercise: 1,solution:["text","textA"]}
+    ], Groups: [
+      {id: "A", users: [ 1 ]}
+    ], Users: [
+      {id: 1, pseudonym: 1}
+    ], Exercises: [
+      {id: 1,
+        activationDate: moment().add(1,"days").toJSON(),
+        dueDate: moment().add(7, "days").toJSON()}
+    ]};
+    db.Set(DB);
+    return db.Exercises.setExerciseSolution(1,1,["abc","cde"]).should.be.rejected;
   });
 });
