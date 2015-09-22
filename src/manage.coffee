@@ -3,17 +3,19 @@ _ = require 'lodash'
 moment = require 'moment'
 uuid = require 'node-uuid'
 utils = require './utils'
+rndString = require 'randomstring'
 
 
 module.exports = (root) ->
 
-  storeTutor: (name, pw_hash) ->
+  storeTutor: (name, pw_hash, salt) ->
     new Promise (resolve, reject) ->
       idx = _.findIndex root.DB.Tutors, {name: name}
       if idx == -1
-        root.DB.Tutors.push {name: name, pw: pw_hash}
+        root.DB.Tutors.push {name: name, pw: pw_hash, salt: salt}
       else
         root.DB.Tutors[idx].pw = pw_hash
+        root.DB.Tutors[idx].salt = salt
       resolve()
 
   storeExercise: (exercise) ->

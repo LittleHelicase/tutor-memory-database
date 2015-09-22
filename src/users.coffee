@@ -2,6 +2,7 @@
 _ = require 'lodash'
 moment = require 'moment'
 uuid = require 'node-uuid'
+rndString = require 'randomstring'
 
 
 module.exports = (root) ->
@@ -56,3 +57,17 @@ module.exports = (root) ->
     new Promise (resolve) ->
       pseudonyms = _.map root.DB.Users, "pseudonym"
       resolve _.compact pseudonyms
+
+  getTutor: (name) ->
+    new Promise (resolve) ->
+      tutor = _.select root.DB.Tutors, (t) -> t.name == name
+      if tutor.length == 0
+        tutor = [{name:name, salt: rndString.generate()}]
+      tutorClone = _.clone tutor[0]
+      delete tutorClone.pw
+      resolve tutorClone
+
+  authTutor: (name, pw_hash) ->
+    new Promise (resolve) ->
+      tutor = _.select root.DB.Tutors, (t) -> t.name == name
+      resolve tutor[0].pw == pw_hash

@@ -157,3 +157,10 @@ module.exports =
         pseudonym: "Tiny Knuth"
       }
     ]
+  Tutors:
+    [
+      {
+        name: "max"
+        pw: "abc"
+      }
+    ]
