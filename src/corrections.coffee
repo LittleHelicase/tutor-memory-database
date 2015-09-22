@@ -11,6 +11,26 @@ module.exports = (root) ->
       r.group == solution.group and r.exercise == solution.exercise
     return result.length == 1
 
+  lockSolutionForTutor = (tutor, exercise_id, group_id) ->
+    new Promise (resolve, reject) ->
+      s_idx = -1
+      solution = _.select root.DB.Solutions, (s, idx) ->
+        searched = s.exercise == exercise_id and s.group == group_id
+        if searched
+          s_idx = idx
+        return searched
+      if solution.length == 0
+        reject "Cannot lock non existing Solution (exercise: #{exercises_id}, group: #{group_id})"
+      else if solution.length > 1
+        reject "DB inconsistency, solution exists multiple times (exercise: #{exercises_id}, group: #{group_id})"
+      else if solution[0].lock and solution[0].lock != tutor
+        reject "Solution already locked for #{solution[0].lock}"
+      else if hasResult solution[0]
+        reject "Solution already has a result"
+      else
+        root.DB.Solutions[s_idx].lock = tutor
+        resolve solution
+
   exerciseIDForNum = (number) ->
     _(root.DB.Exercises).chain()
       .select (e) -> e.number == exercise_num
@@ -55,27 +75,7 @@ module.exports = (root) ->
           s.exercise == exercise_id and s.lock?
         resolve solutions
 
-    lockSolutionForTutor: (exercise_id, group_id, tutor) ->
-      new Promise (resolve, reject) ->
-        s_idx = -1
-        solution = _.select root.DB.Solutions, (s, idx) ->
-          searched = s.exercise == exercise_id and s.group == group_id
-          if searched
-            s_idx = idx
-          return searched
-        if solution.length == 0
-          reject "Cannot lock non existing Solution (exercise: #{exercises_id}, group: #{group_id})"
-        else if solution.length > 1
-          reject "DB inconsistency, solution exists multiple times (exercise: #{exercises_id}, group: #{group_id})"
-        else if solution[0].lock and solution[0].lock != tutor
-          reject "Solution already locked for #{solution[0].lock}"
-        else if hasResult solution[0]
-          reject "Solution already has a result"
-        else
-          root.DB.Solutions[s_idx].lock = tutor
-          resolve solution
-
-    lockNextSolutionForTutor: (exercise_id, tutor) ->
+    lockNextSolutionForTutor: (tutor, exercise_id) ->
       solution = _(root.DB.Solutions).chain()
         .select (s) -> s.exercise == exercise_id
         .reject hasResult
@@ -85,7 +85,7 @@ module.exports = (root) ->
       if !solution?
         Promise.reject "No pending solutions to lock"
       else
-        API.lockSolutionForTutor(solution.exercise, solution.group, tutor)
+        lockSolutionForTutor(tutor, solution.group, solution.exercise)
 
     getNumPending: (exercise_id) ->
       new Promise (resolve, reject) ->
