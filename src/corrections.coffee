@@ -64,6 +64,19 @@ module.exports = (root) ->
         ex_results = _.filter root.DB.Results, (r) -> exercise_id == r.exercise
         resolve ex_results
 
+    getResultForExercise: (id) ->
+      new Promise (resolve, reject) ->
+        solutions = _.filter root.DB.Solutions, (s) -> s.id == id
+        resolve solutions[0]
+
+    setResultForExercise: (tutor, id, result) ->
+      new Promise (resolve, reject) ->
+        idx = _.findIndex root.DB.Solutions, (s) -> s.id == id
+        if root.DB.Solutions[idx].lock != tutor
+          reject "Only locked solutions can be updated"
+        root.DB.Solutions[idx].result = result
+        resolve()
+
     getSolutionsForExercise: (exercise_id) ->
       new Promise (resolve, reject) ->
         solutions = _.filter root.DB.Solutions, (s) -> s.exercise == exercise_id
