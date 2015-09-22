@@ -80,7 +80,8 @@ module.exports = (root) ->
     # Total points for current user
     getTotalPoints: (user_id, result) ->
       new Promise (resolve, reject) ->
-        group = utils.groupForUser user_id, root.DB
+        pseudo = utils.pseudonymForUser user_id
+        group = utils.groupForUser pseudo, root.DB
         if group == -1
           reject "Could not find a group for user with ID #{user_id}"
           return
@@ -94,7 +95,8 @@ module.exports = (root) ->
 
     getExerciseSolution: (user_id, exercise_id) ->
       new Promise (resolve, reject) ->
-        group = utils.groupForUser user_id, root.DB
+        pseudo = utils.pseudonymForUser user_id, root.DB
+        group = utils.groupForUser pseudo, root.DB
         if group == -1
           reject "Could not find a group for user with ID #{user_id}"
           return
@@ -113,7 +115,8 @@ module.exports = (root) ->
       new Promise (resolve, reject) ->
         if !API.isActive exercise_id
           reject "Cannot change solution for an exercise that is not active (user #{user_id}, execise: #{exercise_id})"
-        group = utils.groupForUser user_id, root.DB
+        pseudo = utils.pseudonymForUser user_id, root.DB
+        group = utils.groupForUser pseudo, root.DB
         if group == -1
           reject "Could not find a group for user with ID #{user_id}"
           return
@@ -128,10 +131,10 @@ module.exports = (root) ->
           return
         if sols.length == 1
           root.DB.Solutions[s_idx].solution = solutions
-          resolve root.DB.Solutions[s_idx]
+          resolve()
         else
           root.DB.Solutions.push
             exercise: exercise_id
             group: groupID
             solution: solutions
-          resolve root.DB.Solutions[root.DB.Solutions.length - 1]
+          resolve()

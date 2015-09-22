@@ -36,7 +36,7 @@ module.exports =
         exercise: "ee256059-9d92-4774-9db2-456378e04586"
         pdf: ""
         explicit: true
-        solutions: [
+        solution: [
           "$$\\mathcal O(n)$$",
           "```dot digraph....```",
           "Bla bla"
@@ -47,7 +47,7 @@ module.exports =
         exercise: "ee256059-9d92-4774-9db2-456378e04586"
         pdf: ""
         explicit: false
-        soluitions: [
+        soluition: [
           "$$\\mathcal O(n^2)$$",
           "A->B,C->B ...",
           "War viel zu schwer, nicht bearbeitet"
@@ -93,7 +93,7 @@ module.exports =
       {
         number: 2
         activationDate: moment().subtract(1, 'days').toJSON()
-        dueDate: moment().add(100, 'days').toJSON()
+        dueDate: moment().add(1000, 'years').toJSON()
         id: "f31ad341-9d92-4774-9db2-456378e04586"
         tasks: [
           {
