@@ -7,9 +7,10 @@ utils = require './utils'
 
 module.exports = (root) ->
   hasResult = (solution) ->
-    result = _.select root.DB.Results, (r) ->
-      r.group == solution.group and r.exercise == solution.exercise
-    return result.length == 1
+    "results" of solution
+
+  isFinalized = (solution) ->
+    "results" of solution and not solution.inProcess
 
   lockSolutionForTutor = (tutor, exercise_id, group_id) ->
     new Promise (resolve, reject) ->
@@ -29,7 +30,8 @@ module.exports = (root) ->
         reject "Solution already has a result"
       else
         root.DB.Solutions[s_idx].lock = tutor
-        resolve solution
+        root.DB.Solutions[s_idx].inProcess = true
+        resolve solution[0]
 
   exerciseIDForNum = (number) ->
     _(root.DB.Exercises).chain()
@@ -50,9 +52,9 @@ module.exports = (root) ->
         Promise.all([
           API.getResultsForExercise(e.id),
           API.getSolutionsForExercise(e.id)
-          # getLockedExercises(e.id)
+          API.getLockedSolutionsForExercise(e.id)
         ]).then (values) ->
-          exercise: e.id, solutions: values[1].length, corrected: values[0].length
+          exercise: e.id, solutions: values[1].length, corrected: values[0].length, locked: values[2].length
       Promise.all status
 
 
@@ -61,7 +63,7 @@ module.exports = (root) ->
     # get the list of all results for an exercise
     getResultsForExercise: (exercise_id) ->
       new Promise (resolve, reject) ->
-        ex_results = _.filter root.DB.Results, (r) -> exercise_id == r.exercise
+        ex_results = _.select root.DB.Solutions, (s) -> exercise_id == s.exercise and isFinalized s
         resolve ex_results
 
     getResultForExercise: (id) ->
@@ -74,7 +76,20 @@ module.exports = (root) ->
         idx = _.findIndex root.DB.Solutions, (s) -> s.id == id
         if root.DB.Solutions[idx].lock != tutor
           reject "Only locked solutions can be updated"
+          return
         root.DB.Solutions[idx].result = result
+        resolve()
+
+    finishSolution: (tutor, id) ->
+      new Promise (resolve, reject) ->
+        idx = _.findIndex root.DB.Solutions, (s) -> s.id == id
+        if root.DB.Solutions[idx].lock != tutor
+          reject "Only locked solutions finished"
+          return
+        if !root.DB.Solutions[idx].results?
+          reject "Cannot finish solution without a result"
+          return
+        root.DB.Solutions[idx].inProcess = false
         resolve()
 
     getSolutionsForExercise: (exercise_id) ->
@@ -88,6 +103,18 @@ module.exports = (root) ->
           s.exercise == exercise_id and s.lock?
         resolve solutions
 
+    getFinishedSolutionsForTutor: (tutor) ->
+      new Promise (resolve, reject) ->
+        solutions = _.select root.DB.Solutions, (s) ->
+          s.lock == tutor and not s.inProcess
+        resolve solutions
+
+    getUnfinishedSolutionsForTutor: (tutor) ->
+      new Promise (resolve, reject) ->
+        solutions = _.select root.DB.Solutions, (s) ->
+          s.lock == tutor and s.inProcess
+        resolve solutions
+
     lockNextSolutionForTutor: (tutor, exercise_id) ->
       solution = _(root.DB.Solutions).chain()
         .select (s) -> s.exercise == exercise_id
@@ -98,12 +125,12 @@ module.exports = (root) ->
       if !solution?
         Promise.reject "No pending solutions to lock"
       else
-        lockSolutionForTutor(tutor, solution.group, solution.exercise)
+        lockSolutionForTutor(tutor, solution.exercise, solution.group)
 
     getNumPending: (exercise_id) ->
       new Promise (resolve, reject) ->
         pending = _(root.DB.Solutions).chain()
           .select (s) -> s.exercise == exercise_id
-          .reject hasResult
+          .reject isFinalized
           .value()
         resolve pending.length

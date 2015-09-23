@@ -2,40 +2,16 @@
 moment = require 'moment'
 
 module.exports =
-  Results:
-    [
-      {
-        group: "af3fb55a-4b6f-11e5-90ba-685b35b5d746"
-        exercise: "ee256059-9d92-4774-9db2-456378e04586"
-        task: "f4ca6e7e-3f6e-11e5-8359-685b35b5d746"
-        corrector: "mklein"
-        points: 5
-        data: [] # contains correction information
-      },
-      {
-        group: "af3fb55a-4b6f-11e5-90ba-685b35b5d746"
-        exercise: "ee256059-9d92-4774-9db2-456378e04586"
-        task: "ff7f08de-3f6e-11e5-9b7e-685b35b5d746"
-        corrector: "few"
-        points: 10
-        data: [] # contains correction information
-      },
-      {
-        group: "af3fb55a-4b6f-11e5-90ba-685b35b5d746"
-        exercise: "ee256059-9d92-4774-9db2-456378e04586"
-        task: "0801fe80-3f6f-11e5-abbc-685b35b5d746"
-        corrector: "XY"
-        points: 0.5
-        data: [] # contains correction information
-      }
-    ]
   Solutions:
     [
       {
+        id: "85ca34c0-61d6-11e5-97cb-685b35b5d746"
         group: "af3fb55a-4b6f-11e5-90ba-685b35b5d746"
         exercise: "ee256059-9d92-4774-9db2-456378e04586"
         pdf: ""
-        explicit: true
+        lock: "tutor"
+        inProcess: true
+        results: ["JO, No, JO"]
         solution: [
           "$$\\mathcal O(n)$$",
           "```dot digraph....```",
@@ -43,10 +19,10 @@ module.exports =
         ]
       },
       {
+        id: "8c510bb6-61d6-11e5-8a80-685b35b5d746"
         group: "fd8c6b08-572d-11e5-9824-685b35b5d746"
         exercise: "ee256059-9d92-4774-9db2-456378e04586"
         pdf: ""
-        explicit: false
         soluition: [
           "$$\\mathcal O(n^2)$$",
           "A->B,C->B ...",

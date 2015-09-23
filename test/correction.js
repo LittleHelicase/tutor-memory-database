@@ -13,11 +13,9 @@ describe("Corretion methods", function(){
   it("should return the number of pending corrections", function(){
     var DB = {Solutions:[
       {exercise: 1, group: 1},
-      {exercise: 1, group: 2},
+      {exercise: 1, group: 2, results:[]},
       {exercise: 2, group: 1},
       {exercise: 2, group: 2}
-    ],Results: [
-      {exercise: 1, group: 1}
     ]};
     db.Set(DB);
 
@@ -25,7 +23,7 @@ describe("Corretion methods", function(){
       pending.should.equal(1);
     });
   });
-  it("has can list all solutions for an exercise", function(){
+  it("can list all solutions for an exercise", function(){
     var DB = {Solutions:[
       {exercise: 1, group: 1},
       {exercise: 1, group: 2},
@@ -37,6 +35,13 @@ describe("Corretion methods", function(){
     return db.Corrections.getSolutionsForExercise(1).then(function(sols){
       sols.should.have.length(2);
       sols.should.deep.include.members([{exercise: 1, group: 1},{exercise: 1, group: 2}]);
+    });
+  });
+  it("is possible to list all pending corrections for a tutor", function(){
+    var DB = {Solutions:[{lock:"tutor",inProcess:true},{lock:"tutor"},{lock:"tutor",inProcess:false}]};
+    db.Set(DB);
+    return db.Corrections.getUnfinishedSolutionsForTutor("tutor").then(function(sol){
+      sol.should.have.length(1);
     });
   });
   it("should be possible to store results for a locked solution", function(){
@@ -89,31 +94,72 @@ describe("Corretion methods", function(){
 
     return db.Corrections.lockSolutionForTutor("tutor",1,1).should.be.rejected;
   });
+  */
   it("should lock a random not corrected solution", function(){
-    var DB = {Solutions: [{exercise:1, group:1},{exercise:1,group:2}],
-      Results: [{exercise:1, group: 1}]};
+    var DB = {Solutions: [{exercise:1, group:1, results:[]},{exercise:1,group:2}]};
     db.Set(DB);
 
-    return db.Corrections.lockNextSolutionForTutor("tutor2",1).then(function(){
+    return db.Corrections.lockNextSolutionForTutor("tutor",1).then(function(){
       DB.Solutions[1].lock.should.equal("tutor");
     });
-  });*/
+  });
+
+  it("should mark a newly locked solution as 'inProcess'", function(){
+    var DB = {Solutions: [{exercise:1,group:2}]};
+    db.Set(DB);
+
+    return db.Corrections.lockNextSolutionForTutor("tutor",1).then(function(sol){
+      sol.inProcess.should.be.true;
+    });
+  });
 
   it("should fail if no exercise could be locked", function(){
-    var DB = {Solutions: [{exercise:1, group:1},{exercise:2,group:2}],
-      Results: [{exercise:1, group: 1}]};
+    var DB = {Solutions: [{exercise:1, group:1, results:[]},{exercise:2,group:2}]};
     db.Set(DB);
 
     return db.Corrections.lockNextSolutionForTutor("tutor",3).should.be.rejected;
   });
+
+  it("should finalize a solution by setting the 'inProcess' marker to false", function(){
+    var DB = {Solutions: [{id:1,results:[],lock:"tutor",inProcess:true}]};
+    db.Set(DB);
+
+    return db.Corrections.finishSolution("tutor",1).then(function(){
+      return db.Corrections.getUnfinishedSolutionsForTutor("tutor").then(function(sols){
+        sols.should.have.length(0);
+      });
+    });
+  });
+
+  it("should not finalize a solution of another tutor", function(){
+    var DB = {Solutions: [{id:1,results:[],lock:"tutor",inProcess:true}]};
+    db.Set(DB);
+
+    return db.Corrections.finishSolution("tutor2",1).should.be.rejected;
+  });
+
+  it("should not finalize a solution without results", function(){
+    var DB = {Solutions: [{id:1,lock:"tutor",inProcess:true}]};
+    db.Set(DB);
+
+    return db.Corrections.finishSolution("tutor2",1).should.be.rejected;
+  });
+
+  it("should list all unfinished exercises for a tutor", function(){
+    var DB = {Solutions: [{id:1,lock:"tutor",inProcess:true},{id:1,lock:"tutor",inProcess:false}]};
+    db.Set(DB);
+
+    return db.Corrections.getUnfinishedSolutionsForTutor("tutor").then(function(sols){
+      sols.should.have.length(1);
+    });
+  });
+
   it("has a method returning the correction status of all exercises", function(){
     var DB = {Solutions:[
-      {exercise: 1, group: 1},
+      {exercise: 1, group: 1, results:[]},
       {exercise: 1, group: 2},
-      {exercise: 2, group: 1},
+      {exercise: 2, group: 1, lock:"blubb",inProcess:true},
       {exercise: 2, group: 2}
-    ],Results: [
-      {exercise: 1, group: 1}
     ],Exercises:[
       {id: 1, activationDate: moment().subtract(1, "days")},
       {id: 2, activationDate: moment().subtract(1, "days")}
@@ -122,8 +168,8 @@ describe("Corretion methods", function(){
 
     return db.Corrections.getStatus().then(function(status){
       status.should.have.length(2);
-      status.should.deep.include.members([{exercise:1,solutions:2,corrected:1},
-            {exercise:2,solutions:2,corrected:0}])
+      status.should.deep.include.members([{exercise:1,solutions:2,corrected:1,locked:0},
+            {exercise:2,solutions:2,corrected:0,locked:1}])
     })
   });
 });
