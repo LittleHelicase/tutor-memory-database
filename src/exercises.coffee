@@ -107,7 +107,12 @@ module.exports = (root) ->
           reject "Inconsistent DB, multiple solutions for group #{groupID} in exercise #{exercise_id}"
           return
         if solutions.length == 1
-          resolve solutions[0]
+          sol = _.clone solutions[0]
+          if solutions[0].inProcess
+            delete sol.lock
+            delete sol.results
+          delete sol.inProcess
+          resolve sol
         else
           resolve null
 
