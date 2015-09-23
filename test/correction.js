@@ -156,7 +156,7 @@ describe("Corretion methods", function(){
 
   it("has a method returning the correction status of all exercises", function(){
     var DB = {Solutions:[
-      {exercise: 1, group: 1, results:[]},
+      {exercise: 1, group: 1, results:[],lock: "tutor",inProcess:false},
       {exercise: 1, group: 2},
       {exercise: 2, group: 1, lock:"blubb",inProcess:true},
       {exercise: 2, group: 2}
@@ -168,7 +168,7 @@ describe("Corretion methods", function(){
 
     return db.Corrections.getStatus().then(function(status){
       status.should.have.length(2);
-      status.should.deep.include.members([{exercise:1,solutions:2,corrected:1,locked:0},
+      status.should.deep.include.members([{exercise:1,solutions:2,corrected:1,locked:1},
             {exercise:2,solutions:2,corrected:0,locked:1}])
     })
   });
