@@ -8,14 +8,13 @@ rndString = require 'randomstring'
 
 module.exports = (root) ->
 
-  storeTutor: (name, pw_hash, salt) ->
+  storeTutor: (name, pw_hash) ->
     new Promise (resolve, reject) ->
       idx = _.findIndex root.DB.Tutors, {name: name}
       if idx == -1
-        root.DB.Tutors.push {name: name, pw: pw_hash, salt: salt}
+        root.DB.Tutors.push {name: name, pw: pw_hash}
       else
         root.DB.Tutors[idx].pw = pw_hash
-        root.DB.Tutors[idx].salt = salt
       resolve()
 
   storeExercise: (exercise) ->
