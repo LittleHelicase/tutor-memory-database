@@ -56,21 +56,7 @@ describe("Student Exercise Queries", function(){
     });
   });
 
-  it("should be able to get detailed information for an exercise", function(){
-    var DB = {Exercises:[
-      {id:"abc",activationDate: moment().subtract(2, 'days').toJSON()},
-      {id:"cde",activationDate: moment().subtract(2, 'days').toJSON()},
-      {id:"efg",activationDate: moment().subtract(2, 'days').toJSON()}
-    ]};
-    db.Set(DB);
-
-    return db.Exercises.getDetailed("abc").then(function(ex){
-      (Array.isArray(ex)).should.be.false;
-      ex.id.should.equal("abc");
-    });
-  });
-
-  it("should hide task information for a normal exercise query", function(){
+  it("should hide solution information for a normal exercise query", function(){
     var DB = {
       Exercises:[
         {id:"abc",activationDate: moment().subtract(2, 'days').toJSON(),tasks:[],solutions:[]}
@@ -80,12 +66,11 @@ describe("Student Exercise Queries", function(){
     return db.Exercises.getById("abc").then(function(ex){
       (Array.isArray(ex)).should.be.false;
       ex.id.should.equal("abc");
-      ex.should.not.have.key("tasks");
       ex.should.not.have.key("solutions");
     });
   });
 
-  it("should be able to get the solution for an exercise", function(){
+  it("should be able to get the users solution for an exercise", function(){
     var DB = {Solutions:[
       {group:"A",exercise: 1,solution:["text","textA"]},
       {group:2,exercise: 1,solution:["text2","textA2"]},
@@ -107,7 +92,7 @@ describe("Student Exercise Queries", function(){
     });
   });
 
-  it("should hide unfinished results", function(){
+  it("should hide unfinished tutor results", function(){
     var DB = {Solutions:[
       {group:"A",exercise: 1,solution:["text","textA"],results:"bla",inProcess:true,lock:"tutor"}
     ], Groups: [
@@ -128,7 +113,7 @@ describe("Student Exercise Queries", function(){
     });
   });
 
-  it("should show finished results", function(){
+  it("should show finished tutor results", function(){
     var DB = {Solutions:[
       {group:"A",exercise: 1,solution:["text","textA"],results:"bla",inProcess:false}
     ], Groups: [
@@ -148,7 +133,7 @@ describe("Student Exercise Queries", function(){
     });
   });
 
-  it("a non existing solution should return an empty object", function(){
+  it("a non existing solution should return null", function(){
     var DB = {Solutions:[
       {group:"B",exercise: 1,solutions:["text","textA"]},
       {group:2,exercise: 1,solutions:["text2","textA2"]},

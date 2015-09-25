@@ -15,7 +15,6 @@ module.exports = (root) ->
             .filter (ex) -> moment().isAfter ex.activationDate
             .map (ex) ->
               exNew = _.clone ex
-              delete exNew.tasks
               delete exNew.solutions
               exNew
             .value())
@@ -30,7 +29,6 @@ module.exports = (root) ->
             .filter id: id
             .map (ex) ->
               exNew = _.clone ex
-              delete exNew.tasks
               delete exNew.solutions
               exNew
             .first()
@@ -50,7 +48,6 @@ module.exports = (root) ->
             moment().isBefore ex.dueDate
           .map (ex) ->
             exNew = _.clone ex
-            delete exNew.tasks
             delete exNew.solutions
             exNew
           .value())
@@ -62,20 +59,6 @@ module.exports = (root) ->
           (moment().isAfter ex.activationDate) and
           (moment().isBefore ex.dueDate)
         .value()).length == 1
-
-    # Exercise containing the tasks
-    getDetailed: (id) ->
-      new Promise (resolve) ->
-        resolve( _(root.DB.Exercises).chain()
-            .filter (ex) ->
-              moment().isAfter ex.activationDate
-            .filter id: id
-            .map (ex) ->
-              exNew = _.clone ex
-              delete exNew.solutions
-              exNew
-            .first()
-            .value())
 
     # Total points for current user
     getTotalPoints: (user_id, result) ->
