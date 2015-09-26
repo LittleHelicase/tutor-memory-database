@@ -23,7 +23,7 @@ module.exports =
         group: "fd8c6b08-572d-11e5-9824-685b35b5d746"
         exercise: "ee256059-9d92-4774-9db2-456378e04586"
         pdf: ""
-        soluition: [
+        solution: [
           "$$\\mathcal O(n^2)$$",
           "A->B,C->B ...",
           "War viel zu schwer, nicht bearbeitet"

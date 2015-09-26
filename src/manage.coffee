@@ -37,3 +37,21 @@ module.exports = (root) ->
   listGroups: ->
     new Promise (resolve, reject) ->
       resolve root.DB.Groups
+
+  lockUnprocessedSolutions: ->
+    new Promise (resolve) ->
+      sol = _(root.DB.Solutions).chain()
+        .reject (s) -> s.processed and not s.processingLock
+        .sample()
+        .value()
+      sol.processingLock = true
+      resolve sol
+
+  processedSolution: (id, result, pdf) ->
+    new Promise (resolve) ->
+      idx = _.findIndex root.DB.Solutions, (s) -> s.id == id
+      root.DB.Solutions[idx].processed = true
+      root.DB.Solutions[idx].processingLock = false
+      root.DB.Solutions[idx].pdf = pdf
+      root.DB.Solutions[idx].slaveResult = result
+      resolve()
