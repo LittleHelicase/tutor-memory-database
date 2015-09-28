@@ -16,6 +16,7 @@
     "gulp-util": "^3.0.6",
     "gulp-watch": "^4.3.3",
     "mocha": "^2.2.5",
+    "trash": "^2.0.0",
     "vinyl-source-stream": "~1.0.0"
   },
   "repository": "github:Welfenlab/tutor-memory-database",
