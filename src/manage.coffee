@@ -39,11 +39,17 @@ module.exports = (root) ->
       resolve root.DB.Groups
 
   lockUnprocessedSolutions: ->
-    new Promise (resolve) ->
+    new Promise (resolve, reject) ->
       sol = _(root.DB.Solutions).chain()
-        .reject (s) -> s.processed and not s.processingLock
+        .reject (s) -> s.processed or s.processingLock
         .sample()
         .value()
+      if !sol
+        reject "No pending solutions to lock"
+      idx = _.findIndex root.DB.Solutions, (s) -> s.id == sol.id
+      if idx == -1
+        reject "Solution has no ID and cannot be locked"
+      root.DB.Solutions[idx].processingLock = true
       sol.processingLock = true
       resolve sol
 

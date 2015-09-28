@@ -57,5 +57,27 @@ describe("Managing methods", function(){
       tutors[0].should.be.a("string");
       tutors[1].should.be.a("string");
     });
-  })
+  });
+  it("should lock a not locked solution", function() {
+    var DB = {Solutions:[{id:1, solutions:["abc"]}]};
+    db.Set(DB);
+    
+    return db.Manage.lockUnprocessedSolutions().then(function(sol){
+      sol.id.should.equal(1);
+    });
+  });
+  it("should not lock a marked solution", function() {
+    var DB = {Solutions:[{id:1, processingLock: true},{id:2}]};
+    db.Set(DB);
+    
+    return db.Manage.lockUnprocessedSolutions().then(function(sol){
+      sol.id.should.equal(2);
+    });
+  });
+  it("should reject if no solution can be locked", function() {
+    var DB = {Solutions:[{id:1, processingLock: true},{id:2, processed: true}]};
+    db.Set(DB);
+    
+    return db.Manage.lockUnprocessedSolutions().should.be.rejected;
+  });
 });
