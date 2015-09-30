@@ -54,7 +54,7 @@ module.exports = (root) ->
           API.getSolutionsForExercise(e.id)
           API.getLockedSolutionsForExercise(e.id)
         ]).then (values) ->
-          exercise: e.id, solutions: values[1].length, corrected: values[0].length, locked: values[2].length
+          exercise: e, solutions: values[1].length, corrected: values[0].length, locked: values[2].length
       Promise.all status
 
 

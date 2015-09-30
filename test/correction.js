@@ -155,21 +155,29 @@ describe("Corretion methods", function(){
   });
 
   it("has a method returning the correction status of all exercises", function(){
+    var date = moment().subtract(1, "days");
     var DB = {Solutions:[
       {exercise: 1, group: 1, results:[],lock: "tutor",inProcess:false},
       {exercise: 1, group: 2},
       {exercise: 2, group: 1, lock:"blubb",inProcess:true},
       {exercise: 2, group: 2}
     ],Exercises:[
-      {id: 1, activationDate: moment().subtract(1, "days")},
-      {id: 2, activationDate: moment().subtract(1, "days")}
+      {id: 1, activationDate: date},
+      {id: 2, activationDate: date}
     ]};
     db.Set(DB);
 
     return db.Corrections.getStatus().then(function(status){
       status.should.have.length(2);
-      status.should.deep.include.members([{exercise:1,solutions:2,corrected:1,locked:1},
-            {exercise:2,solutions:2,corrected:0,locked:1}])
+      status.should.deep.include.members([
+        {
+          exercise:{id: 1, activationDate: date},
+          solutions:2,corrected:1,locked:1
+        },
+        {
+          exercise:{id: 2, activationDate: date},
+          solutions:2,corrected:0,locked:1
+        }])
     })
   });
 });
