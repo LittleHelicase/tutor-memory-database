@@ -1,6 +1,6 @@
 {
   "name": "@tutor/memory-database",
-  "version": "0.4.9",
+  "version": "0.4.10",
   "description": "Non persistent memory implementation of database.",
   "main": "./lib/db.js",
   "scripts": {
