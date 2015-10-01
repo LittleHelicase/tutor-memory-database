@@ -78,14 +78,11 @@ describe("User queries", function(){
     });
   });
 
-  it("can query a non existing user without error", function(){
+  it("cannot query a non existing", function(){
     var DB = {Tutors: []};
     db.Set(DB);
 
-    return db.Users.getTutor("nonExisting").then(function(tutor){
-      tutor.name.should.equal("nonExisting");
-      tutor.should.have.any.key("salt");
-    });
+    return db.Users.getTutor("nonExisting").should.be.rejected;
   });
 
   it("can authorize a tutor", function(){
@@ -96,30 +93,30 @@ describe("User queries", function(){
       isAuthorized.should.be.true;
     });
   });
-  
+
   it("can lock a pseudonym", function(){
     var DB = {PseudonymList:[{pseudonym:"abc"}]};
     db.Set(DB);
-    
+
     return db.Users.lockRandomPseudonymFromList(1,["ccc"]).then(function(pseudo){
       pseudo.should.equal("ccc");
     })
   });
-  
+
   it("cannot lock already reserved pseudonyms", function(){
     var DB = {PseudonymList:[{pseudonym:"abc"},{pseudonym:"ccc"}]};
     db.Set(DB);
-    
+
     return db.Users.lockRandomPseudonymFromList(1,["ccc","abc"]).should.be.rejected;
   });
-  
+
   it("clears pending pseudonyms if they are old enough", function(){
     var DB = {PseudonymList:[{pseudonym:"abc",user:2,locked:moment().subtract(16,"minutes").toJSON()}]};
     db.Set(DB);
-    
+
     return db.Users.lockRandomPseudonymFromList(1,["abc"]).should.be.fulfilled;
   });
-  
+
   it("set a pseudonym that is locked for the user", function() {
     var DB = {
       PseudonymList:[{pseudonym:"abc",user:1,locked:moment().subtract(12,"minutes").toJSON()}],

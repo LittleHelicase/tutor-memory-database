@@ -143,5 +143,11 @@ module.exports =
       {
         name: "max"
         pw: "abc"
+        contingent: 10
+      },
+      {
+        name: "few"
+        pw: "cde"
+        contingent: 8
       }
     ]

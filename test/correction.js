@@ -164,20 +164,38 @@ describe("Corretion methods", function(){
     ],Exercises:[
       {id: 1, activationDate: date},
       {id: 2, activationDate: date}
+    ],Tutors: [
+      {name:"tutor", contingent:1}
     ]};
     db.Set(DB);
 
-    return db.Corrections.getStatus().then(function(status){
+    return db.Corrections.getStatus("tutor").then(function(status){
       status.should.have.length(2);
       status.should.deep.include.members([
         {
           exercise:{id: 1, activationDate: date},
+          should: 2,
+          is: 1,
           solutions:2,corrected:1,locked:1
         },
         {
           exercise:{id: 2, activationDate: date},
+          should: 2,
+          is: 0,
           solutions:2,corrected:0,locked:1
         }])
+    })
+  });
+
+  it("can calculate the contingent for an exercise and tutor", function(){
+    var DB = {Tutors:[{name:"a",contingent:20},{name:"b",contingent:10}],
+      Solutions:[{exercise:1},{exercise:1,lock:"a",inProcess:false},{exercise:1},{exercise:2}]
+    };
+    db.Set(DB);
+
+    return db.Corrections.getExerciseContingentForTutor("a",1).then(function(contingent){
+      contingent.should.should.equal(2);
+      contingent.is.should.equal(1);
     })
   });
 });

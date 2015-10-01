@@ -46,17 +46,33 @@ module.exports = (root) ->
     # [
     #  {exercise: 1, solutions: 100, corrected: 50, locked: 10}
     # ]
-    getStatus: ->
+    getStatus: (name) ->
       exercises = _.filter root.DB.Exercises, (e) -> moment().isAfter e.activationDate
       status = _.map exercises, (e) ->
         Promise.all([
           API.getResultsForExercise(e.id),
           API.getSolutionsForExercise(e.id)
           API.getLockedSolutionsForExercise(e.id)
+          API.getExerciseContingentForTutor(name, e.id)
         ]).then (values) ->
-          exercise: e, solutions: values[1].length, corrected: values[0].length, locked: values[2].length
+          exercise: e,
+          solutions: values[1].length,
+          corrected: values[0].length,
+          locked: values[2].length
+          should: values[3].should
+          is: values[3].is
+
       Promise.all status
 
+    getExerciseContingentForTutor: (name, exercise_id) ->
+      new Promise (resolve) ->
+        total_contingent = _.reduce root.DB.Tutors, ((acc, t) -> acc + t.contingent), 0
+        tutor_contingent = (_.find root.DB.Tutors, (t) -> t.name == name).contingent
+        ex_solutions = _.filter root.DB.Solutions, (s) -> s.exercise == exercise_id
+        tutor_solutions = _.filter ex_solutions, (s) -> s.lock == name and s.inProcess == false
+
+        perc_contingent = tutor_contingent / total_contingent
+        resolve should: ex_solutions.length * perc_contingent, is: tutor_solutions.length
 
     # get locked exercise for tutor
 

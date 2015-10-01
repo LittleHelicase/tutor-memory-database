@@ -10,7 +10,7 @@ module.exports = (root, config) ->
   clearPendingPseudonyms = ->
     root.DB.PseudonymList = _.reject root.DB.PseudonymList, (p) ->
       p.locked and moment().add(config.lockTime, "minutes").isAfter p.locked
-  
+
   exists: (id) ->
     new Promise (resolve, reject) ->
       user = _.select root.DB.Users, (u) -> u.id == id
@@ -70,7 +70,7 @@ module.exports = (root, config) ->
     new Promise (resolve) ->
       pseudonyms = _.map root.DB.Users, "pseudonym"
       resolve _.compact pseudonyms
-  
+
   lockRandomPseudonymFromList: (id, plist) ->
     new Promise (resolve, reject) ->
       clearPendingPseudonyms root
@@ -85,10 +85,11 @@ module.exports = (root, config) ->
         resolve pseudo
 
   getTutor: (name) ->
-    new Promise (resolve) ->
+    new Promise (resolve, reject) ->
       tutor = _.select root.DB.Tutors, (t) -> t.name == name
       if tutor.length == 0
-        tutor = [{name:name, salt: rndString.generate()}]
+        reject "Tutor #{name} does not exist"
+        return
       tutorClone = _.clone tutor[0]
       delete tutorClone.pw
       resolve tutorClone
