@@ -6,7 +6,7 @@ chai.use(chaiAsPromised);
 chai.should();
 
 var moment = require("moment");
-var db = require("../lib/db")();
+var db = require("../lib/db")({});
 
 describe("Managing methods", function(){
   it("should create a new tutor", function(){

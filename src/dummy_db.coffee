@@ -30,6 +30,11 @@ module.exports =
         ]
       }
     ]
+  PseudonymList: [
+    { pseudonym: "Lazy Dijkstra", user: "ABC-DEF" },
+    { pseudonym: "Lonely Gates", user: "NO-GROUP-1" },
+    { pseudonym: "Tiny Knuth", user: "NO-GROUP-2" }
+  ]
   Exercises:
     [
       {

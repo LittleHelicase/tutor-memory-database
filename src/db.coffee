@@ -14,9 +14,9 @@ module.exports = (config) ->
   Backup: (toFile) ->
     fs.writeFileSync toFile, JSON.stringify root.DB
 
-  Student: (require './student_queries')(root)
-  Exercises: (require './exercises')(root)
-  Users: (require './users')(root)
-  Groups: (require './groups')(root)
-  Corrections: (require './corrections')(root)
-  Manage: (require './manage')(root)
+  Student: (require './student_queries')(root, config)
+  Exercises: (require './exercises')(root, config)
+  Users: (require './users')(root, config)
+  Groups: (require './groups')(root, config)
+  Corrections: (require './corrections')(root, config)
+  Manage: (require './manage')(root, config)

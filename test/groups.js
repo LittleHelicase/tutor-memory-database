@@ -5,7 +5,7 @@ var chaiAsPromised = require("chai-as-promised");
 chai.use(chaiAsPromised);
 chai.should();
 
-var db = require("../lib/db")();
+var db = require("../lib/db")({});
 
 describe("Group queries", function(){
   it("should return the group for a user", function(){

@@ -7,7 +7,7 @@ chai.use(chaiAsPromised);
 chai.should();
 
 var moment = require("moment");
-var db = require("../lib/db")();
+var db = require("../lib/db")({});
 
 describe("Corretion methods", function(){
   it("should return the number of pending corrections", function(){

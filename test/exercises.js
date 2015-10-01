@@ -6,7 +6,7 @@ chai.use(chaiAsPromised);
 chai.should();
 
 var moment = require("moment");
-var db = require("../lib/db")();
+var db = require("../lib/db")({});
 
 describe("Student Exercise Queries", function(){
   it("should filter not activated exercises", function(){
