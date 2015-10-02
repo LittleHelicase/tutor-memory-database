@@ -87,6 +87,14 @@ module.exports = (root) ->
         solutions = _.filter root.DB.Solutions, (s) -> s.id == id
         resolve solutions[0]
 
+    getPDFForID: (id) ->
+      new Promise (resolve, reject) ->
+        solution = _.filter root.DB.Solution, (s) -> s.id = id
+        if solution.length == 1
+          resolve solution[0].pdf or ""
+        else
+          resolve ""
+
     setResultForExercise: (tutor, id, result) ->
       new Promise (resolve, reject) ->
         idx = _.findIndex root.DB.Solutions, (s) -> s.id == id
