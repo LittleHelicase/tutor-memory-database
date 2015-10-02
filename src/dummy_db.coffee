@@ -142,12 +142,12 @@ module.exports =
     [
       {
         name: "max"
-        pw: "abc"
+        pw: "$2a$04$rOZPlMpKBKKNrJ6gF7m92O.O1cbOKl0R30ryfgnVKcMtEyqBO5zT2"
         contingent: 10
       },
       {
         name: "few"
-        pw: "cde"
+        pw: "$2a$04$EwmqMb9Dycxiy2fJlZsfR.64aClI.g2O/5ooenN9PuCXiJUFpTjIu"
         contingent: 8
       }
     ]

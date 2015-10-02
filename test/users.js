@@ -89,8 +89,25 @@ describe("User queries", function(){
     var DB = {Tutors: [{name: "a", pw:"test123"}]};
     db.Set(DB);
 
-    return db.Users.authTutor("a", "test123").then(function(isAuthorized){
+    var cmpPromise = function(pw){ return new Promise(function(resolve){
+        resolve(pw == "test123");
+      })
+    };
+    return db.Users.authTutor("a",cmpPromise).then(function(isAuthorized){
       isAuthorized.should.be.true;
+    });
+  });
+
+  it("can reject a tutor", function(){
+    var DB = {Tutors: [{name: "a", pw:"test123"}]};
+    db.Set(DB);
+
+    var cmpPromise = function(pw){ return new Promise(function(resolve){
+        resolve(false);
+      })
+    };
+    return db.Users.authTutor("a",cmpPromise).then(function(isAuthorized){
+      isAuthorized.should.be.false;
     });
   });
 

@@ -94,7 +94,6 @@ module.exports = (root, config) ->
       delete tutorClone.pw
       resolve tutorClone
 
-  authTutor: (name, pw_hash) ->
-    new Promise (resolve) ->
-      tutor = _.select root.DB.Tutors, (t) -> t.name == name
-      resolve tutor[0].pw == pw_hash
+  authTutor: (name, pw_compare) ->
+    tutor = _.select root.DB.Tutors, (t) -> t.name == name
+    pw_compare tutor[0].pw
