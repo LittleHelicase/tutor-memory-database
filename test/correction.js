@@ -9,7 +9,7 @@ chai.should();
 var moment = require("moment");
 var db = require("../lib/db")({});
 
-describe("Corretion methods", function(){
+describe("Correction methods", function(){
   it("should return the number of pending corrections", function(){
     var DB = {Solutions:[
       {exercise: 1, group: 1},
