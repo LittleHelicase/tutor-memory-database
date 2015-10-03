@@ -116,6 +116,17 @@ module.exports = (root) ->
         root.DB.Solutions[idx].inProcess = false
         resolve()
 
+    getUserSolutions: (user) ->
+      new Promise (resolve, reject) ->
+        group = utils.groupForUserId user, root.DB
+
+        resolve _.filter root.DB.Solutions, (r) -> r.group == group.id
+
+    getUserExerciseSolution: (user, exercise_id) ->
+      new Promise (resolve, reject) ->
+        group = utils.groupForUserId user, root.DB
+        resolve _.find root.DB.Solutions, (r) -> r.group == group.id and r.exercise == exercise_id
+
     getSolutionsForExercise: (exercise_id) ->
       new Promise (resolve, reject) ->
         solutions = _.filter root.DB.Solutions, (s) -> s.exercise == exercise_id

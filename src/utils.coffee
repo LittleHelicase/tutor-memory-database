@@ -2,15 +2,11 @@
 _ = require 'lodash'
 
 module.exports =
-  groupForUser: (user_pseudo, DB) ->
-    group = _.filter DB.Groups, (g) ->
-      _.includes g.users, user_pseudo
-    if group.length != 1
-      return -1
-    group[0]
+  userIDForPseudonym: (pseudonym, DB) ->
+    _.result _.find(DB.Users, (u) -> u.pseudonym == pseudonym), "id"
+
+  groupForUserId: (user_id, DB) ->
+    _.find DB.Groups, (g) -> _.includes g.users, user_id
 
   pseudonymForUser: (id, DB) ->
-    user = _.filter DB.Users, (u) -> u.id == id
-    if user.length != 1
-      return -1
-    user[0].pseudonym
+    _.result _.find(DB.Users, (u) -> u.id == id), "pseudonym"

@@ -37,7 +37,7 @@ describe("Correction methods", function(){
       sols.should.deep.include.members([{exercise: 1, group: 1},{exercise: 1, group: 2}]);
     });
   });
-  it("is possible to list all pending corrections for a tutor", function(){
+  it("lists all pending corrections for a tutor", function(){
     var DB = {Solutions:[{lock:"tutor",inProcess:true},{lock:"tutor"},{lock:"tutor",inProcess:false}]};
     db.Set(DB);
     return db.Corrections.getUnfinishedSolutionsForTutor("tutor").then(function(sol){
@@ -151,6 +151,27 @@ describe("Correction methods", function(){
 
     return db.Corrections.getUnfinishedSolutionsForTutor("tutor").then(function(sols){
       sols.should.have.length(1);
+    });
+  });
+
+  it("has a method that lists all solutions of a user", function(){
+    var DB = {Solutions: [{id:1,group:1,exercise:1}],
+              Groups: [{id:1,users:[2]}]};
+    db.Set(DB);
+
+    return  db.Corrections.getUserSolutions(2).then(function(sols){
+      sols.should.have.length(1);
+      sols.should.deep.include.members([{id:1,group:1,exercise:1}]);
+    });
+  });
+
+  it("can get a specific solution for a user", function(){
+    var DB = {Solutions: [{id:1,group:1,exercise:1},{id:2,group:1,exercise:2},{id:3,group:2,exercise:2}],
+              Groups: [{id:1,users:[2]}]};
+    db.Set(DB);
+
+    return  db.Corrections.getUserExerciseSolution(2,2).then(function(sols){
+      sols.id.should.equal(2);
     });
   });
 

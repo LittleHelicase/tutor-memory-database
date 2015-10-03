@@ -111,13 +111,13 @@ module.exports =
       {
         name: "One man group"
         id: "af3fb55a-4b6f-11e5-90ba-685b35b5d746"
-        users: [ "Lazy Dijkstra" ]
+        users: [ "ABC-DEF" ]
       },
       {
         name: "pending group"
         id: "fd8c6b08-572d-11e5-9824-685b35b5d746"
-        users: ["Tiny Knuth"]
-        pendingUsers: ["Lazy Dijkstra"]
+        users: ["NO-GROUP-2"]
+        pendingUsers: ["ABC-DEF"]
       }
     ]
   Users:

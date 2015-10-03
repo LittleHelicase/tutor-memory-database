@@ -63,9 +63,8 @@ module.exports = (root) ->
     # Total points for current user
     getTotalPoints: (user_id, result) ->
       new Promise (resolve, reject) ->
-        pseudo = utils.pseudonymForUser user_id
-        group = utils.groupForUser pseudo, root.DB
-        if group == -1
+        group = utils.groupForUserId user_id, root.DB
+        if !group?
           reject "Could not find a group for user with ID #{user_id}"
           return
         groupID = group.id
@@ -78,9 +77,8 @@ module.exports = (root) ->
 
     getExerciseSolution: (user_id, exercise_id) ->
       new Promise (resolve, reject) ->
-        pseudo = utils.pseudonymForUser user_id, root.DB
-        group = utils.groupForUser pseudo, root.DB
-        if group == -1
+        group = utils.groupForUserId user_id, root.DB
+        if !group?
           reject "Could not find a group for user with ID #{user_id}"
           return
         groupID = group.id
@@ -103,9 +101,8 @@ module.exports = (root) ->
       new Promise (resolve, reject) ->
         if !API.isActive exercise_id
           reject "Cannot change solution for an exercise that is not active (user #{user_id}, execise: #{exercise_id})"
-        pseudo = utils.pseudonymForUser user_id, root.DB
-        group = utils.groupForUser pseudo, root.DB
-        if group == -1
+        group = utils.groupForUserId user_id, root.DB
+        if !group?
           reject "Could not find a group for user with ID #{user_id}"
           return
         groupID = group.id

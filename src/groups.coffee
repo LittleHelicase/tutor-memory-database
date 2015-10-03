@@ -5,97 +5,89 @@ moment = require 'moment'
 uuid = require 'node-uuid'
 utils = require './utils'
 
-module.exports = (root) ->
+module.exports = (root, config) ->
   # destructive removale of user. Make sure to insert him into another group afterwards
-  leaveGroup = (user_pseudo) ->
-    group = utils.groupForUser user_pseudo, root.DB
+  leaveGroup = (user_id) ->
+    group = utils.groupForUserId user_id, root.DB
+    if group
+      # remove user from group
+      _.remove group.users, (u) -> u == user_id
+    else
+      config.log "User (#{user_id}) was in no group."
 
-    # remove user from group
-    _.remove group.users, (u) -> u == user_pseudo
+
+  # remove sensitive infomation in group
+  desensetizeGroup = (group) ->
+    dGroup = _.clone group
+    dGroup.users = _.map dGroup.users, _.partial utils.pseudonymForUser, _, root.DB
+    dGroup.pendingUsers = _.map dGroup.pendingUsers, _.partial utils.pseudonymForUser, _, root.DB
+    return dGroup
 
 
   # return
   create: (user_id, group_users) ->
     new Promise (resolve, reject) ->
-      user_pseudo =utils.pseudonymForUser user_id, root.DB
-      if user_pseudo == -1
-        reject "Unable to identify user with ID #{user_id}"
       # make sure the user is not in two groups at the same time
-      leaveGroup user_pseudo
+      leaveGroup user_id
+
+      grp_userids = _.map group_users, (_.partial utils.userIDForPseudonym, _, root.DB)
 
       # the creator immediatley joins the group
-      pendingUsers = _.reject group_users, (pseudo) -> pseudo == user_pseudo
+      pendingUsers = _.reject grp_userids, (id) -> id == user_id
 
       newGroup =
         id: uuid.v4()
-        users: [user_pseudo]
+        users: [user_id]
       if pendingUsers.length > 0
         newGroup.pendingUsers = pendingUsers
       root.DB.Groups.push newGroup
-      resolve newGroup
+      resolve desensetizeGroup newGroup
 
   # get the Group of one user
   getGroupForUser: (user_id) ->
     new Promise (resolve, reject) ->
-      user_pseudo = utils.pseudonymForUser user_id, root.DB
-      if user_pseudo == -1
-        reject "Unable to identify user with ID #{user_id}"
-      group = utils.groupForUser user_pseudo, root.DB
-      if group == -1
-        reject "Could not find a group for user with Pseudonym #{user_pseudo}"
+      group = utils.groupForUserId user_id, root.DB
+      if !group?
+        reject "Could not find a group for user with Id #{user_id}"
         return
-      resolve group
+      resolve desensetizeGroup group
 
   # returns a list of groups with pending invitations
   pending: (user_id) ->
     new Promise (resolve) ->
-      user_pseudo = utils.pseudonymForUser user_id, root.DB
-      if user_pseudo == -1
-        reject "Unable to identify user with ID #{user_id}"
-      pending = _.select root.DB.Groups, (g) ->
-        g.pendingUsers and _.includes g.pendingUsers, user_pseudo
-      resolve pending
+      resolve _.map (_.select root.DB.Groups, (g) ->
+        g.pendingUsers and _.includes g.pendingUsers, user_id), desensetizeGroup
 
   rejectInvitation: (user_id, group_id) ->
     new Promise (resolve, reject) ->
-      user_pseudo = utils.pseudonymForUser user_id, root.DB
-      if user_pseudo == -1
-        reject "Unable to identify user with ID #{user_id}"
-      group = _.filter root.DB.Groups, id: group_id
-      if group.length > 1 or group.length == 0
-        resolve()
+      group = _.find root.DB.Groups, id: group_id
+      if !group?
+        reject "User #{user_id} tried to leave non existing group #{group_id}"
         return
-
-      group = group[0]
       if group.pendingUsers
-        group.pendingUsers = _.reject group.pendingUsers, (pseudo) -> user_pseudo == pseudo
+        group.pendingUsers = _.reject group.pendingUsers, (id) -> user_id == id
       resolve()
 
   joinGroup: (user_id, group_id) ->
     new Promise (resolve, reject) ->
-      user_pseudo = utils.pseudonymForUser user_id, root.DB
-      if user_pseudo == -1
-        reject "Unable to identify user with ID #{user_id}"
-      group = _.filter root.DB.Groups, id: group_id
-      if group.length > 1 or  group.length <= 0
-        reject "Inconsistent groups. Multiple groups with ID: #{group_id}"
+      group = _.find root.DB.Groups, id: group_id
+      if !group?
+        reject "User #{user_id} tried to join non existing group #{group_id}"
         return
-
-      group = group[0]
 
       # return if the user is already in the group
-      if _.includes group.users, user_pseudo
-        resolve group
+      if _.includes group.users, user_id
+        resolve desensetizeGroup group
         return
       # make sure the user is invited to the group
-      if not group.pendingUsers or not _.includes group.pendingUsers, user_pseudo
+      if not group.pendingUsers or not _.includes group.pendingUsers, user_id
         reject "User cannot join a group without invitation"
         return
 
       # make sure the user is not in two groups at the same time
-      leaveGroup user_pseudo
-      group.pendingUsers = _.reject group.pendingUsers, user_pseudo
+      leaveGroup user_id
+      group.pendingUsers = _.reject group.pendingUsers, user_id
       if group.pendingUsers.length == 0
         delete group.pendingUsers
-      group.users.push user_pseudo
-      resolve group
+      group.users.push user_id
+      resolve desensetizeGroup group

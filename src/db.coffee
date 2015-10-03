@@ -6,6 +6,8 @@ root = {}
 root.DB = require './dummy_db'
 
 module.exports = (config) ->
+  if !config.log
+    config.log = console.log.bind console
   Set: (newDB) ->
     root.DB = newDB
   Restore: (file) ->
