@@ -6,6 +6,8 @@ rndString = require 'randomstring'
 
 
 module.exports = (root, config) ->
+  Groups = (require './groups')(root, config)
+
   config.lockTime = config.lockTime or 15
   clearPendingPseudonyms = ->
     root.DB.PseudonymList = _.reject root.DB.PseudonymList, (p) ->
@@ -57,7 +59,7 @@ module.exports = (root, config) ->
 
   create: (user) ->
     if not user.id or not user.name or not user.pseudonym or not user.matrikel
-      return Promise.reject "User "
+      return Promise.reject "User information incomplete ("+JSON.stringify(user)+")"
     new Promise (resolve, reject) ->
       userIdx = _.findIndex root.DB.Users, (u) -> u.id == id
       if userIdx != -1
