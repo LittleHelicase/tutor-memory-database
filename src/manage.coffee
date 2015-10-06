@@ -17,6 +17,23 @@ module.exports = (root) ->
         root.DB.Tutors[idx].pw = pw_hash
       resolve()
 
+  get: ->
+    new Promise (resolve) ->
+      # Memory queries don't fail...
+      resolve root.DB.Exercises
+
+  # Returns a specific exercise by id
+  getById: (id) ->
+    new Promise (resolve) ->
+      res = _(root.DB.Exercises).chain()
+          .filter id: id
+          .first()
+          .value()
+      if res
+        resolve res
+      else
+        reject()
+
   storeExercise: (exercise) ->
     new Promise (resolve, reject) ->
       idx = _.findIndex root.DB.Exercises, {id: exercise.id}

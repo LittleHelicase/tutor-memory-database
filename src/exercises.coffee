@@ -36,7 +36,7 @@ module.exports = (root) ->
         if res
           resolve res
         else
-          reject
+          reject()
 
     # Returns all exercises which can still be edited
     # expirationDate > now()
