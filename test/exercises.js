@@ -33,6 +33,21 @@ describe("Student Exercise Queries", function(){
     });
   });
 
+  it("should hide solution information for a normal exercise query by id", function(){
+    var DB = {
+      Exercises:[
+        {id:1,activationDate: moment().subtract(2, 'days').toJSON(),tasks:[],solutions:[]}
+      ]
+    };
+    db.Set(DB);
+
+    return db.Exercises.getById(1).then(function(ex){
+      (Array.isArray(ex)).should.be.false;
+      ex.id.should.equal(1);
+      ex.should.not.have.key("solutions");
+    });
+  });
+
   it("should not return an unactive exercise by id", function(){
     var DB = {Exercises:[
       {activationDate: moment().subtract(2, 'days').toJSON(),id:1},

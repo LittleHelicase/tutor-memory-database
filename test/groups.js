@@ -73,7 +73,7 @@ describe("Group queries", function(){
       group.users.should.contain("B");
     });
   });
-  it("it is not possible to join a group without an invitation", function(){
+  it("should not be possible to join a group without an invitation", function(){
     var DB = {Groups:[{id:1,users:[1],pendingUsers:[2,3]},
                       {id:2,users:[4],pendingUsers:[2,3]},
                       {id:3,users:[7],pendingUsers:[1,3]}],

@@ -26,6 +26,7 @@ describe("User queries", function(){
       exists.should.be.false;
     });
   });
+  // memory database only phenomena
   it("should detect broken user databases", function(){
     var DB = {Users:[{id:1},{id:1}]};
     db.Set(DB);
@@ -58,7 +59,7 @@ describe("User queries", function(){
       DB.Users[0].matrikel.should.equal("12345678");
     });
   });
-
+  // memory database only phenomena
   it("should not be possible to create two users with the same id", function(){
     var DB = {Users:[{id:1,pseudonym:"P"}]};
     db.Set(DB);

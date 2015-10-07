@@ -153,16 +153,6 @@ describe("Correction methods", function(){
       sols.should.have.length(1);
     });
   });
-  
-  it("returns only queried unfinished exercises", function(){
-    var DB = {Solutions: [{id:1,exercise:1,lock:"tutor",inProcess:true},{id:1,lock:"tutor",inProcess:false}]};
-    db.Set(DB);
-
-    return db.Corrections.getUnfinishedSolutionsForTutor("tutor").then(function(sols){
-      console.log(sols);
-      sols.should.have.length(0);
-    });
-  });
 
   it("has a method that lists all solutions of a user", function(){
     var DB = {Solutions: [{id:1,group:1,exercise:1}],
@@ -172,16 +162,6 @@ describe("Correction methods", function(){
     return  db.Corrections.getUserSolutions(2).then(function(sols){
       sols.should.have.length(1);
       sols.should.deep.include.members([{id:1,group:1,exercise:1}]);
-    });
-  });
-
-  it("can get a specific solution for a user", function(){
-    var DB = {Solutions: [{id:1,group:1,exercise:1},{id:2,group:1,exercise:2},{id:3,group:2,exercise:2}],
-              Groups: [{id:1,users:[2]}]};
-    db.Set(DB);
-
-    return  db.Corrections.getUserExerciseSolution(2,2).then(function(sols){
-      sols.id.should.equal(2);
     });
   });
 
@@ -228,5 +208,15 @@ describe("Correction methods", function(){
       contingent.should.should.equal(2);
       contingent.is.should.equal(1);
     })
+  });
+
+  it("can get a specific solution for a user", function(){
+    var DB = {Solutions: [{id:1,group:1,exercise:1},{id:2,group:1,exercise:2},{id:3,group:2,exercise:2}],
+              Groups: [{id:1,users:[2]}]};
+    db.Set(DB);
+
+    return  db.Corrections.getUserExerciseSolution(2,2).then(function(sols){
+      sols.id.should.equal(2);
+    });
   });
 });
