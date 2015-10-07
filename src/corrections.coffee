@@ -152,7 +152,7 @@ module.exports = (root) ->
 
     lockNextSolutionForTutor: (tutor, exercise_id) ->
       solution = _(root.DB.Solutions).chain()
-        .select (s) -> s.exercise == exercise_id
+        .select (s) -> s.exercise == exercise_id and not s.lock != tutor
         .reject hasResult
         .sample()
         .value()
