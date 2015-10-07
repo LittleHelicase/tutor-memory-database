@@ -102,4 +102,16 @@ describe("Group queries", function(){
       DB.Groups[1].pendingUsers.should.have.length(1);
     });
   });
+  it("should be possible to leave a group", function() {
+    var DB = {Groups:[{id:1,users:[1],pendingUsers:[2,3]},
+                      {id:2,users:[4],pendingUsers:[2,3]},
+                      {id:3,users:[7],pendingUsers:[1,3]}],
+              Users: [{id:1,pseudonym:"A"},{id:2,pseudonym:"B"},
+                {id:3,pseudonym:"C"},{id:4,pseudonym:"D"},{id:7,pseudonym:"G"}]};
+    db.Set(DB);
+    return db.Groups.leaveGroup(1).then(function() {
+      DB.Groups[0].users.should.be.empty;
+      DB.Users[0].previousGroups.should.contain(1);
+    })
+  });
 });

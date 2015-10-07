@@ -126,16 +126,19 @@ module.exports =
         id: "ABC-DEF"
         matrikel: "1234560"
         pseudonym: "Lazy Dijkstra"
+        previousGroups: []
       },
       {
         id: "NO-GROUP-1"
         matrikel: "9234560"
         pseudonym: "Lonely Gates"
+        previousGroups: []
       },
       {
         id: "NO-GROUP-2"
         matrikel: "8234560"
         pseudonym: "Tiny Knuth"
+        previousGroups: []
       }
     ]
   Tutors:

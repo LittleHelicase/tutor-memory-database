@@ -10,11 +10,22 @@ module.exports = (root, config) ->
   leaveGroup = (user_id) ->
     group = utils.groupForUserId user_id, root.DB
     if group
+      # update user previousGroups
+      selection = {}
+      _.select root.DB.Users, (u,idx) ->
+        if u.id == user_id
+          selection.idx = idx
+        return u.id == user_id
+
+      if (root.DB.Users[selection.idx].previousGroups)
+        root.DB.Users[selection.idx].previousGroups.push(group.id);
+      else
+        root.DB.Users[selection.idx].previousGroups = [group.id];
+
       # remove user from group
       _.remove group.users, (u) -> u == user_id
     else
       config.log "User (#{user_id}) was in no group."
-
 
   # remove sensitive infomation in group
   desensetizeGroup = (group) ->
@@ -91,3 +102,12 @@ module.exports = (root, config) ->
         delete group.pendingUsers
       group.users.push user_id
       resolve desensetizeGroup group
+
+  leaveGroup: (user_id) ->
+    new Promise (resolve, reject) ->
+      user = _.find root.DB.Users, id: user_id
+      if !user?
+        reject "User #{user_id} does not exist and therefore cannot leave a group."
+        return
+
+      resolve leaveGroup user_id
