@@ -146,11 +146,21 @@ describe("Correction methods", function(){
   });
 
   it("should list all unfinished exercises for a tutor", function(){
-    var DB = {Solutions: [{id:1,lock:"tutor",inProcess:true},{id:1,lock:"tutor",inProcess:false}]};
+    var DB = {Solutions: [{id:1,exercise:1,lock:"tutor",inProcess:true},{id:1,lock:"tutor",inProcess:false}]};
+    db.Set(DB);
+
+    return db.Corrections.getUnfinishedSolutionsForTutor("tutor",1).then(function(sols){
+      sols.should.have.length(1);
+    });
+  });
+  
+  it("returns only queried unfinished exercises", function(){
+    var DB = {Solutions: [{id:1,exercise:1,lock:"tutor",inProcess:true},{id:1,lock:"tutor",inProcess:false}]};
     db.Set(DB);
 
     return db.Corrections.getUnfinishedSolutionsForTutor("tutor").then(function(sols){
-      sols.should.have.length(1);
+      console.log(sols);
+      sols.should.have.length(0);
     });
   });
 

@@ -12,10 +12,24 @@ module.exports =
         lock: "tutor"
         inProcess: true
         results: ["JO, No, JO"]
-        solution: [
-          "$$\\mathcal O(n)$$",
-          "```dot digraph....```",
-          "Bla bla"
+        tasks: [
+          { 
+            solution: "$$\\mathcal O(n)$$"
+            tests: [
+              { name: "Sollte O(n) sein", passes: true },
+              { name: "Keine Rechtschreibfehler!", passes: false } 
+            ]
+          },
+          {
+            solution: "```dot digraph....```",
+            tests:[
+              { name: "Ein Graph sollte da sein!", passes: true }
+            ],
+          },
+          {
+            solution: "Bla bla"
+            tests: []
+          }
         ]
       },
       {
@@ -23,10 +37,24 @@ module.exports =
         group: "fd8c6b08-572d-11e5-9824-685b35b5d746"
         exercise: "ee256059-9d92-4774-9db2-456378e04586"
         pdf: ""
-        solution: [
-          "$$\\mathcal O(n^2)$$",
-          "A->B,C->B ...",
-          "War viel zu schwer, nicht bearbeitet"
+        tasks: [
+          { 
+            solution: "$$\\mathcal O(n^2)$$", 
+            tests: [
+              { name: "Sollte O(n) sein", passes: true },
+              { name: "Keine Rechtschreibfehler!", passes: false } 
+            ]
+          },
+          {
+            solution: "A->B,C->B ...",
+            tests:[
+              { name: "Ein Graph sollte da sein!", passes: false }
+            ],
+          },
+          {
+            solution: "War viel zu schwer, nicht bearbeitet"
+            tests: []
+          }          
         ]
       }
     ]
