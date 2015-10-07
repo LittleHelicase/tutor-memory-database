@@ -11,7 +11,7 @@ module.exports = (root, config) ->
   config.lockTime = config.lockTime or 15
   clearPendingPseudonyms = ->
     root.DB.PseudonymList = _.reject root.DB.PseudonymList, (p) ->
-      p.locked and moment().add(config.lockTime, "minutes").isAfter p.locked
+      p.locked and moment().subtract(config.lockTime, "minutes").isAfter p.locked
 
   exists: (id) ->
     new Promise (resolve, reject) ->
@@ -34,7 +34,7 @@ module.exports = (root, config) ->
   setPseudonym: (id, newPseudonym) ->
     new Promise (resolve, reject) ->
       clearPendingPseudonyms()
-      pseudonymUser = _.select root.DB.PseudonymList, (u) -> u.pseudonym == newPseudonym or u.user == id
+      pseudonymUser = _.select root.DB.PseudonymList, (u) -> u.pseudonym == newPseudonym and u.user != id
       if pseudonymUser.length > 0
         reject "Pseudonym #{newPseudonym} already locked"
         return
