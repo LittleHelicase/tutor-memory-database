@@ -15,7 +15,7 @@ module.exports = (root) ->
             .filter (ex) -> moment().isAfter ex.activationDate
             .map (ex) ->
               exNew = _.clone ex
-              delete exNew.solutions
+              exNew.tasks = _.map exNew.tasks, (t) -> delete t.solution; t
               exNew
             .value())
 
@@ -29,7 +29,7 @@ module.exports = (root) ->
             .filter id: id
             .map (ex) ->
               exNew = _.clone ex
-              delete exNew.solutions
+              exNew.tasks = _.map exNew.tasks, (t) -> delete t.solution; t
               exNew
             .first()
             .value()
@@ -48,7 +48,7 @@ module.exports = (root) ->
             moment().isBefore ex.dueDate
           .map (ex) ->
             exNew = _.clone ex
-            delete exNew.solutions
+            exNew.tasks = _.map exNew.tasks, (t) -> delete t.solution; t
             exNew
           .value())
 
