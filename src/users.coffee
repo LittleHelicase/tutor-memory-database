@@ -34,10 +34,14 @@ module.exports = (root, config) ->
   setPseudonym: (id, newPseudonym) ->
     new Promise (resolve, reject) ->
       clearPendingPseudonyms()
-      pseudonymUser = _.select root.DB.PseudonymList, (u) -> u.pseudonym == newPseudonym and u.user != id
-      if pseudonymUser.length > 0
+      pseudonymUserCount = _(root.DB.PseudonymList).chain()
+        .select (u) -> u.pseudonym == newPseudonym and u.user != id
+        .size()
+
+      if pseudonymUserCount > 0
         reject "Pseudonym #{newPseudonym} already locked"
         return
+
       selection = {}
       user = (_.select root.DB.Users, (u,idx) ->
         if u.id == id

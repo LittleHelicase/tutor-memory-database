@@ -49,6 +49,14 @@ describe("User queries", function(){
       DB.Users[0].pseudonym.should.equal("Q");
     });
   });
+  it("should be possible to change a users pseudonym with itself", function(){
+    var DB = {Users:[{id:1,pseudonym:"Q"}]};
+    db.Set(DB);
+
+    return db.Users.setPseudonym(1,"Q").then(function(){
+      DB.Users[0].pseudonym.should.equal("Q");
+    });
+  });
   it("should be possible to create a new user", function(){
     var DB = {Users:[]};
     db.Set(DB);
