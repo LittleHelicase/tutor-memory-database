@@ -5,7 +5,9 @@ uuid = require 'node-uuid'
 utils = require './utils'
 
 
-module.exports = (root) ->
+module.exports = (root, config) ->
+  config.maxSolutionLocks = config.maxSolutionLocks or 10
+
   hasResult = (solution) ->
     "results" of solution
 
@@ -31,6 +33,7 @@ module.exports = (root) ->
       else
         root.DB.Solutions[s_idx].lock = tutor
         root.DB.Solutions[s_idx].inProcess = true
+        root.DB.Solutions[s_idx].lockTimeStamp = moment().toJSON()
         resolve solution[0]
 
   exerciseIDForNum = (number) ->
@@ -151,12 +154,18 @@ module.exports = (root) ->
         resolve solutions
 
     lockNextSolutionForTutor: (tutor, exercise_id) ->
+      inProgressLockCount = _(root.DB.Solutions).chain()
+        .select (s) -> s.exercise == exercise_id and s.lock == tutor and s.inProcess == false
+        .size()
+
       solution = _(root.DB.Solutions).chain()
         .select (s) -> s.exercise == exercise_id and not s.lock != tutor
         .reject hasResult
         .sample()
         .value()
 
+      if inProgressLockCount >= config.maxSolutionLocks
+        Promise.reject "Too much reserved/locked Solutions for this tutor: #{tutor}"
       if !solution?
         Promise.reject "No pending solutions to lock"
       else

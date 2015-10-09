@@ -11,13 +11,14 @@ module.exports =
         pdf: ""
         lock: "tutor"
         inProcess: true
+        lockTimeStamp: moment().subtract(1, 'days').toJSON()
         results: ["JO, No, JO"]
         tasks: [
-          { 
+          {
             solution: "$$\\mathcal O(n)$$"
             tests: [
               { name: "Sollte O(n) sein", passes: true },
-              { name: "Keine Rechtschreibfehler!", passes: false } 
+              { name: "Keine Rechtschreibfehler!", passes: false }
             ]
           },
           {
@@ -38,11 +39,11 @@ module.exports =
         exercise: "ee256059-9d92-4774-9db2-456378e04586"
         pdf: ""
         tasks: [
-          { 
-            solution: "$$\\mathcal O(n^2)$$", 
+          {
+            solution: "$$\\mathcal O(n^2)$$",
             tests: [
               { name: "Sollte O(n) sein", passes: true },
-              { name: "Keine Rechtschreibfehler!", passes: false } 
+              { name: "Keine Rechtschreibfehler!", passes: false }
             ]
           },
           {
@@ -54,7 +55,7 @@ module.exports =
           {
             solution: "War viel zu schwer, nicht bearbeitet"
             tests: []
-          }          
+          }
         ]
       }
     ]

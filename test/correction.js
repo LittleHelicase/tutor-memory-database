@@ -64,6 +64,17 @@ describe("Correction methods", function(){
     db.Set(DB);
     return db.Corrections.setResultForExercise("tutor",1,["res"]).should.be.rejected;
   });
+  it("should not be possibe to lock more than 10 solutions by a single tutor", function() {
+    var DB = {Solutions: [{exercise: 1, id:1, lock:"Hans"}, {exercise: 1, id:2, lock:"Hans"},
+                          {exercise: 1, id:3, lock:"Hans"}, {exercise: 1, id:4, lock:"Hans"},
+                          {exercise: 1, id:5, lock:"Hans"}, {exercise: 1, id:6, lock:"Hans"},
+                          {exercise: 1, id:7, lock:"Hans"}, {exercise: 1, id:8, lock:"Hans"},
+                          {exercise: 1, id:9, lock:"Hans"}, {exercise: 1, id:10, lock:"Hans"},
+                          {exercise: 1, id:11}, {exercise: 1, id:12}],
+              Tutors: [{name: "Hans"}]}
+    db.Set(DB);
+    return db.Corrections.lockNextSolutionForTutor("Hans", 1).should.be.rejected;;
+  });
   /*
   it("should lock a solution for a tutor", function(){
     var DB = {Solutions: [{exercise:1, group:1},{exercise:2,group:2}]};
@@ -110,6 +121,15 @@ describe("Correction methods", function(){
 
     return db.Corrections.lockNextSolutionForTutor("tutor",1).then(function(sol){
       sol.inProcess.should.be.true;
+    });
+  });
+
+  it("should create a time stamp when locking a solution", function () {
+    var DB = {Solutions: [{exercise: 1, group: 2}]}
+    db.Set(DB);
+
+    return db.Corrections.lockNextSolutionForTutor("tutor", 1).then(function(sol) {
+      sol.should.have.property("lockTimeStamp");
     });
   });
 
