@@ -4,7 +4,6 @@ moment = require 'moment'
 uuid = require 'node-uuid'
 rndString = require 'randomstring'
 
-
 module.exports = (root, config) ->
   Groups = (require './groups')(root, config)
 
