@@ -36,7 +36,11 @@ describe("Student Exercise Queries", function(){
   it("should hide solution information for a normal exercise query by id", function(){
     var DB = {
       Exercises:[
-        {id:1,activationDate: moment().subtract(2, 'days').toJSON(),tasks:[],solutions:[]}
+        {id:1,activationDate: moment().subtract(2, 'days').toJSON(),tasks:[
+          {title: 'abc', maxPoints: 10, text: 'You should!', prefilled: {title: 'title 1', content: 'content 1'}, solution: {}},
+          {title: 'def', maxPoints: 12, text: 'You should too!', prefilled: {title: 'title 2', content: 'content 2'}, solution: {}},
+          {title: 'ghi', maxPoints: 15, text: 'You should also!', prefilled: {title: 'title 3', content: 'content 3'}, solution: {}}
+        ]}
       ]
     };
     db.Set(DB);
@@ -44,7 +48,9 @@ describe("Student Exercise Queries", function(){
     return db.Exercises.getById(1).then(function(ex){
       (Array.isArray(ex)).should.be.false;
       ex.id.should.equal(1);
-      ex.tasks.should.all.not.have.key("solutions");
+      //ex.tasks.should.all.not.have.key("solutions");
+      for (var i = 0; i != ex.tasks.length; ++i)
+        ex.tasks[i].should.not.have.key("solution");
     });
   });
 
@@ -74,14 +80,26 @@ describe("Student Exercise Queries", function(){
   it("should hide solution information for a normal exercise query", function(){
     var DB = {
       Exercises:[
-        {id:"abc",activationDate: moment().subtract(2, 'days').toJSON(),tasks:[],solutions:[]}
+        {id:1,activationDate: moment().subtract(2, 'days').toJSON(),tasks:[
+          {title: 'abc', maxPoints: 10, text: 'You should!', prefilled: {title: 'title 1', content: 'content 1'}},
+          {title: 'def', maxPoints: 12, text: 'You should too!', prefilled: {title: 'title 2', content: 'content 2'}, solution: {}},
+          {title: 'ghi', maxPoints: 15, text: 'You should also!', prefilled: {title: 'title 3', content: 'content 3'}, solution: {}}
+        ]},
+        {id:2,activationDate: moment().subtract(2, 'days').toJSON(),tasks:[
+          {title: 'abc', maxPoints: 10, text: 'You should!', prefilled: {title: 'title 1', content: 'content 1'}},
+          {title: 'def', maxPoints: 12, text: 'You should too!', prefilled: {title: 'title 2', content: 'content 2'}, solution: {}},
+          {title: 'ghi', maxPoints: 15, text: 'You should also!', prefilled: {title: 'title 3', content: 'content 3'}, solution: {}}
+        ]}
       ]
     };
     db.Set(DB);
-    return db.Exercises.getById("abc").then(function(ex){
-      (Array.isArray(ex)).should.be.false;
-      ex.id.should.equal("abc");
-      ex.tasks.should.all.not.have.key("solutions");
+    return db.Exercises.get().then(function(ex){
+      (Array.isArray(ex)).should.be.true;
+      ex.should.have.length(2);
+
+      for (var j = 0; j != ex.length; ++j)
+        for (var i = 0; i != ex[j].tasks.length; ++i)
+          ex[j].tasks[i].should.not.have.key("solution");
     });
   });
 
