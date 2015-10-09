@@ -44,7 +44,7 @@ describe("Student Exercise Queries", function(){
     return db.Exercises.getById(1).then(function(ex){
       (Array.isArray(ex)).should.be.false;
       ex.id.should.equal(1);
-      ex.should.not.have.key("solutions");
+      ex.tasks.should.all.not.have.key("solutions");
     });
   });
 
@@ -81,7 +81,7 @@ describe("Student Exercise Queries", function(){
     return db.Exercises.getById("abc").then(function(ex){
       (Array.isArray(ex)).should.be.false;
       ex.id.should.equal("abc");
-      ex.should.not.have.key("solutions");
+      ex.tasks.should.all.not.have.key("solutions");
     });
   });
 
