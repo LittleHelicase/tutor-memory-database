@@ -37,9 +37,9 @@ describe("Student Exercise Queries", function(){
     var DB = {
       Exercises:[
         {id:1,activationDate: moment().subtract(2, 'days').toJSON(),tasks:[
-          {title: 'abc', maxPoints: 10, text: 'You should!', prefilled: {title: 'title 1', content: 'content 1'}, solution: {}},
+          {title: 'abc', maxPoints: 10, text: 'You should!', prefilled: {title: 'title 1', content: 'content 1'}, solution: {}, solutionTest: {}},
           {title: 'def', maxPoints: 12, text: 'You should too!', prefilled: {title: 'title 2', content: 'content 2'}, solution: {}},
-          {title: 'ghi', maxPoints: 15, text: 'You should also!', prefilled: {title: 'title 3', content: 'content 3'}, solution: {}}
+          {title: 'ghi', maxPoints: 15, text: 'You should also!', prefilled: {title: 'title 3', content: 'content 3'}, solutionTest: {}}
         ]}
       ]
     };
@@ -49,8 +49,10 @@ describe("Student Exercise Queries", function(){
       (Array.isArray(ex)).should.be.false;
       ex.id.should.equal(1);
       //ex.tasks.should.all.not.have.key("solutions");
-      for (var i = 0; i != ex.tasks.length; ++i)
+      for (var i = 0; i != ex.tasks.length; ++i) {
         ex.tasks[i].should.not.have.key("solution");
+        ex.tasks[i].should.not.have.key("solutionTest");
+      }
     });
   });
 
@@ -81,9 +83,9 @@ describe("Student Exercise Queries", function(){
     var DB = {
       Exercises:[
         {id:1,activationDate: moment().subtract(2, 'days').toJSON(),tasks:[
-          {title: 'abc', maxPoints: 10, text: 'You should!', prefilled: {title: 'title 1', content: 'content 1'}},
+          {title: 'abc', maxPoints: 10, text: 'You should!', prefilled: {title: 'title 1', content: 'content 1'}, solution: {}, solutionTest: {}},
           {title: 'def', maxPoints: 12, text: 'You should too!', prefilled: {title: 'title 2', content: 'content 2'}, solution: {}},
-          {title: 'ghi', maxPoints: 15, text: 'You should also!', prefilled: {title: 'title 3', content: 'content 3'}, solution: {}}
+          {title: 'ghi', maxPoints: 15, text: 'You should also!', prefilled: {title: 'title 3', content: 'content 3'}, solutionTest: {}}
         ]},
         {id:2,activationDate: moment().subtract(2, 'days').toJSON(),tasks:[
           {title: 'abc', maxPoints: 10, text: 'You should!', prefilled: {title: 'title 1', content: 'content 1'}},
@@ -98,8 +100,10 @@ describe("Student Exercise Queries", function(){
       ex.should.have.length(2);
 
       for (var j = 0; j != ex.length; ++j)
-        for (var i = 0; i != ex[j].tasks.length; ++i)
+        for (var i = 0; i != ex[j].tasks.length; ++i) {
           ex[j].tasks[i].should.not.have.key("solution");
+          ex[j].tasks[i].should.not.have.key("solutionTest");
+        }
     });
   });
 
