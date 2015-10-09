@@ -65,15 +65,28 @@ describe("Correction methods", function(){
     return db.Corrections.setResultForExercise("tutor",1,["res"]).should.be.rejected;
   });
   it("should not be possibe to lock more than 10 solutions by a single tutor", function() {
-    var DB = {Solutions: [{exercise: 1, id:1, lock:"Hans"}, {exercise: 1, id:2, lock:"Hans"},
-                          {exercise: 1, id:3, lock:"Hans"}, {exercise: 1, id:4, lock:"Hans"},
-                          {exercise: 1, id:5, lock:"Hans"}, {exercise: 1, id:6, lock:"Hans"},
-                          {exercise: 1, id:7, lock:"Hans"}, {exercise: 1, id:8, lock:"Hans"},
-                          {exercise: 1, id:9, lock:"Hans"}, {exercise: 1, id:10, lock:"Hans"},
-                          {exercise: 1, id:11}, {exercise: 1, id:12}],
-              Tutors: [{name: "Hans"}]}
+    var DB = {
+      Solutions:
+      [
+        {exercise: 1, group: 1, id:1, lock:"Hans", inProcess: false},
+        {exercise: 1, group: 2, id:2, lock:"Hans", inProcess: true},
+        {exercise: 1, group: 3, id:3, lock:"Hans", inProcess: true},
+        {exercise: 1, group: 4, id:4, lock:"Hans", inProcess: true},
+        {exercise: 1, group: 5, id:5, lock:"Hans", inProcess: true},
+        {exercise: 1, group: 6, id:6, lock:"Hans", inProcess: true},
+        {exercise: 1, group: 7, id:7, lock:"Hans", inProcess: true},
+        {exercise: 1, group: 8, id:8, lock:"Hans", inProcess: true},
+        {exercise: 1, group: 9, id:9, lock:"Hans", inProcess: true},
+        {exercise: 1, group: 10, id:10, lock:"Hans", inProcess: false},
+        {exercise: 1, group: 11, id:12, lock:"Hans", inProcess: true},
+        {exercise: 1, group: 12, id:13, lock:"Hans", inProcess: true},
+        {exercise: 1, group: 13, id:14, lock:"Hans", inProcess: true},
+        {exercise: 1, group: 14, id:11}, {exercise: 1, id:12}
+      ],
+      Tutors: [{name: "Hans"}]};
+
     db.Set(DB);
-    return db.Corrections.lockNextSolutionForTutor("Hans", 1).should.be.rejected;;
+    return db.Corrections.lockNextSolutionForTutor("Hans", 1).should.be.rejected;
   });
   /*
   it("should lock a solution for a tutor", function(){

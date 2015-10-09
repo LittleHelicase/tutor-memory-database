@@ -23,17 +23,24 @@ module.exports = (root, config) ->
           s_idx = idx
         return searched
       if solution.length == 0
-        reject "Cannot lock non existing Solution (exercise: #{exercises_id}, group: #{group_id})"
+        reject "Cannot lock non existing Solution (exercise: #{exercise_id}, group: #{group_id})"
       else if solution.length > 1
-        reject "DB inconsistency, solution exists multiple times (exercise: #{exercises_id}, group: #{group_id})"
+        reject "DB inconsistency, solution exists multiple times (exercise: #{exercise_id}, group: #{group_id})"
       else if solution[0].lock and solution[0].lock != tutor
         reject "Solution already locked for #{solution[0].lock}"
       else if hasResult solution[0]
         reject "Solution already has a result"
       else
+        inProgressLockCount = _(root.DB.Solutions).chain()
+          .select (s) -> s.exercise == exercise_id and s.lock == tutor and s.inProcess == true
+          .size()
+          .value()
+
         root.DB.Solutions[s_idx].lock = tutor
         root.DB.Solutions[s_idx].inProcess = true
         root.DB.Solutions[s_idx].lockTimeStamp = moment().toJSON()
+        root.DB.Solutions[s_idx].userLocks = inProgressLockCount
+        root.DB.Solutions[s_idx].maxUserLocks = config.maxSolutionLocks
         resolve solution[0]
 
   exerciseIDForNum = (number) ->
@@ -155,18 +162,19 @@ module.exports = (root, config) ->
 
     lockNextSolutionForTutor: (tutor, exercise_id) ->
       inProgressLockCount = _(root.DB.Solutions).chain()
-        .select (s) -> s.exercise == exercise_id and s.lock == tutor and s.inProcess == false
+        .select (s) -> s.exercise == exercise_id and s.lock == tutor and s.inProcess == true
         .size()
+        .value()
 
       solution = _(root.DB.Solutions).chain()
-        .select (s) -> s.exercise == exercise_id and not s.lock != tutor
+        .select (s) -> s.exercise == exercise_id and !s.lock?
         .reject hasResult
         .sample()
         .value()
 
-      if inProgressLockCount >= config.maxSolutionLocks
-        Promise.reject "Too much reserved/locked Solutions for this tutor: #{tutor}"
-      if !solution?
+      if inProgressLockCount > config.maxSolutionLocks
+        return Promise.reject "Too much reserved/locked Solutions for this tutor: #{tutor}"
+      else if !solution?
         Promise.reject "No pending solutions to lock"
       else
         lockSolutionForTutor(tutor, solution.exercise, solution.group)
