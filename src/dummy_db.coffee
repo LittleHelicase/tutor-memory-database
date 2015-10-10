@@ -77,8 +77,8 @@ module.exports =
             title: "Binomialkoeffizienten (40 Punkte)",
             maxPoints: "40",
             text: "beschreibungstext",
-            prefilled: "prefilled",
-            tests: "test",
+            prefilled: "```js\nfunction a(){\n}\n```",
+            tests: "```tests\nit('Funktion a existiert', function(){\n  if(!a || typeof(a) != 'function'){\n    throw 'Die Funktion a ist nicht ordentlich definiert';\n  }\n});\n```",
             solution: "lösung"
           },
           {
