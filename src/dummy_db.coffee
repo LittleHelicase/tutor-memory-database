@@ -75,6 +75,7 @@ module.exports =
         tasks: [
           {
             title: "Binomialkoeffizienten (40 Punkte)",
+            number: "1",
             maxPoints: "40",
             text: "beschreibungstext",
             prefilled: "```js\nfunction a(){\n}\n```",
@@ -83,6 +84,7 @@ module.exports =
           },
           {
             title: "Gimmel Gammel Gummel Shake (30 Punkte)",
+            number: "2",
             maxPoints: "30",
             text: "beschreibungstext",
             prefilled: "prefilled",
@@ -99,14 +101,16 @@ module.exports =
         tasks: [
           {
             title: "Binomialkoeffizienten (40 Punkte)",
+            number: "1",
             maxPoints: "40",
             text: "beschreibungstext",
-            prefilled: "prefilled",
-            tests: "test",
+            prefilled: "```js\nfunction a(){\n}\n```",
+            tests: "```tests\nit('Funktion a existiert', function(){\n  if(!a || typeof(a) != 'function'){\n    throw 'Die Funktion a ist nicht ordentlich definiert';\n  }\n});\n```",
             solution: "lösung"
           },
           {
             title: "Gimmel Gammel Gummel Shake (30 Punkte)",
+            number: "2",
             maxPoints: "30",
             text: "beschreibungstext",
             prefilled: "prefilled",
@@ -115,6 +119,7 @@ module.exports =
           },
           {
             title: "I am bad at sample texts (20 Punkte)",
+            number: "3",
             maxPoints: "20",
             text: "beschreibungstext",
             prefilled: "prefilled",
