@@ -9,7 +9,7 @@ module.exports =
         group: "af3fb55a-4b6f-11e5-90ba-685b35b5d746"
         exercise: "ee256059-9d92-4774-9db2-456378e04586"
         pdf: ""
-        lock: "tutor"
+        lock: "max"
         inProcess: true
         lockTimeStamp: moment().subtract(1, 'days').toJSON()
         results: ["JO, No, JO"]

@@ -157,6 +157,15 @@ describe("Correction methods", function(){
     var DB = {Solutions: [{id:1,results:[],lock:"tutor",inProcess:true}]};
     db.Set(DB);
 
+    return db.Corrections.getUnfinishedSolutionsForTutor("tutor").then(function(sols){
+      sols.should.have.length(1);
+    });
+  });
+
+  it("should finalize a solution by setting the 'inProcess' marker to false", function(){
+    var DB = {Solutions: [{id:1,results:[],lock:"tutor",inProcess:true}]};
+    db.Set(DB);
+
     return db.Corrections.finishSolution("tutor",1).then(function(){
       return db.Corrections.getUnfinishedSolutionsForTutor("tutor").then(function(sols){
         sols.should.have.length(0);

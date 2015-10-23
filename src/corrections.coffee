@@ -154,10 +154,10 @@ module.exports = (root, config) ->
           s.lock == tutor and not s.inProcess and s.exercise == exercise_id
         resolve solutions
 
-    getUnfinishedSolutionsForTutor: (tutor, exercise_id) ->
+    getUnfinishedSolutionsForTutor: (tutor) ->
       new Promise (resolve, reject) ->
         solutions = _.select root.DB.Solutions, (s) ->
-          s.lock == tutor and s.inProcess and s.exercise == exercise_id
+          s.lock == tutor and s.inProcess
         resolve solutions
 
     lockNextSolutionForTutor: (tutor, exercise_id) ->
